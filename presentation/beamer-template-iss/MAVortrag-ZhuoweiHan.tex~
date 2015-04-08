@@ -1,0 +1,735 @@
+% ISS presentation template
+%
+% Change history:
+% 24.06.2010    Jürgen Ruoff        Initial creation
+% 01.07.2010    Patrick Häcker      Generalization
+% 02.07.2010    Patrick Häcker      Adjustment
+% 15.11.2010    Patrick Häcker      Improvements
+% 20.05.2011    Patrick Häcker      Add presentation type
+% 06.01.2012	P. Hermannstädter 	Adapted to ISS, small mods
+% \graphicspath{ {../Fig/} }
+% Insert your name here
+\newcommand{\presenter}{Zhuowei Han}
+\newcommand{\presentershort}{Z.Han}
+\newcommand{\presenteremail}{} 		% can be accessed using \presenteremail
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\mX}{\mathbf{X}}
+\newcommand{\mH}{\mathbf{H}}
+\newcommand{\h}{\mathbf{h}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\y}{\mathbf{y}}
+\newcommand{\W}{\mathbf{W}}
+\newcommand{\vb}{\mathbf{b}}
+\newcommand{\vc}{\mathbf{c}}
+\newcommand{\txtcolb}[1]{\textcolor{blue}{\Large #1}}
+
+% Insert presentation title here
+\newcommand{\presentationtitle}{Deep Network for Speech Emotion Recognition}
+\newcommand{\shortpresentationtitle}{Deep Learning}
+
+% Insert type of presentation here (or comment line), probably one of:
+% Mitarbeitervortrag, Bachelor-Arbeit, Master-Arbeit, Bachelor thesis, Master thesis
+\newcommand{\presentationtype}{---A Study of Deep Learning---}
+
+% Insert presentation date here
+\newcommand{\presentationdate}{16/04/2015}
+
+% Uncomment the following line, if you write in English
+%\newcommand{\lang}{german}
+
+% Uncomment the following line, if you want to create handouts (setting to false does not work!)
+% \newcommand{\handoutmode}{true}
+
+% Load beamer class using LSS style
+\input{presentation}
+
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{pgfpages}
+\graphicspath{ {../Fig/} }
+\usepackage{tikz}
+% \setbeameroption{show notes on second screen=left}
+% \setbeameroption{second mode text on second screen=left}
+% \setbeameroption{show notes}
+% \setbeameroption{show notes on second screen=left}
+
+
+% My commands:
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+\begin{document}
+\lstset{basicstyle=\small\ttfamily,xleftmargin=15pt,language=Matlab,
+        commentstyle=\color{green},showstringspaces=false,stringstyle=\color{magenta}\ttfamily}
+
+% -----------------------------------------------------------------------------
+% This is the title page
+\begin{frame}[t,plain]
+	\titlepage
+\end{frame}
+
+
+% -----------------------------------------------------------------------------
+% Motivation slide
+\begin{frame}[t]{Motivation} % 1 folie
+% \textcolor{blue}{\Large Training objective}
+\only<1-1>{
+\textcolor{blue}{\Large Speech Emotion Recognition}\\
+	\begin{itemize}
+		\itemsep20pt
+		\item Most current work focuses on speech processing based on linguistic information,  e.g.: Skype Translator
+		\item More natural human-machine interaction requires paralinguistic information such as age, gender, emotion.
+		\item Speech Recognition / Speeker Identification / Emotion Recognition
+		\only<1-1>{\begin{figure}[b]
+		 \includegraphics[width=0.6\linewidth]{paraliguistic.png}
+		\end{figure}}
+
+	\end{itemize}
+}
+
+\only<2-2>{
+\textcolor{blue}{\Large Deep Learning}\\
+	\begin{itemize}
+	    \itemsep15pt
+	    \item Deep architecture for extracting complex structure and building internal representations from input
+	    \item New research area of machine learning (from shallow to deep structure)
+	    \item Widely applied in vision/audition processing, e.g. handwriting recognition (Graves, Alex, et al. 2009), traffic sign classification (Schmidhuber, et al. 2011), text translation (Google, 2014)
+	\end{itemize}
+}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% This is the table of contents. You can insert a motivation before or after this slide.
+\begin{frame}
+	\ifthenelse{\equal{\lang}{ngerman}}{
+		\frametitle{Table of Contents}
+	}{
+		\frametitle{Table of Contents}
+	}
+	\tableofcontents
+\end{frame}
+
+% Add an extra slide at the beginning of each section while highlighting the current section
+% Use \section* to skip the slide once or comment the following to skip all overview slides.
+\AtBeginSection[]
+{
+	\begin{frame}<beamer>
+		\ifthenelse{\equal{\lang}{ngerman}}{
+			\frametitle{Table of Contents}
+		}{
+			\frametitle{Table of Contents}
+		}
+% 		\frametitle{\contentsname}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+%% =========
+\section{Foundations} %2 folies
+% -----------------------------------------------------------------------------
+\subsection{Mel Frequency Cepstral Features}
+	\begin{frame}[t]{Mel Frequency Cepstral Features}
+		\begin{minipage}[t]{0.48\linewidth}
+			\begin{itemize}
+				\item short-term power spectrum 
+				\item mel-scale approximate human perception
+				\item widely-used in speech recognition tasks
+				\item Transformation between Mel and Hertz scale
+				\begin{figure}
+
+				\begin{eqnarray}
+				f_{mel} = 1125~\ln~(1+f_{Hz}/700)\nonumber\\
+				f_{Hz} = 700 \left(\exp(f_{mel}/1125)-1\right)\nonumber
+				\end{eqnarray}
+
+			\end{figure}
+			\end{itemize}
+		\end{minipage}
+		\begin{minipage}[t]{0.48\linewidth}
+		\begin{figure}
+		 \includegraphics[width = \linewidth]{MelvsHz.png}
+		\end{figure}
+		\end{minipage}
+	\end{frame}
+
+
+\subsection{Emotion Recognition Approaches}
+
+\begin{frame}[t]{Emotion Recognition Approaches}
+	\begin{minipage}[t]{0.48\linewidth}
+	  \textcolor{blue}{\Large Traditional Approaches}
+	  \begin{itemize}
+	   \item pre-selected features
+	   \item supervised training
+	   \item low-level features not appropriate for claasification
+	   \item shallow structure of classifiers
+	  \end{itemize}
+	\end{minipage}\hfill
+	\begin{minipage}[t]{0.48\linewidth}
+	\textcolor{blue}{\Large Deep Learning Approaches}
+	  \begin{itemize}
+	   \item learning representations from high-dim data
+	   \item extracting appropriate features without hand-crafting
+	   \item low-level features are used to build high-level features as network gets deeper
+	   \item frame-based classification
+	  \end{itemize}
+
+	\end{minipage}
+
+\end{frame}
+
+
+\section{Conditional Restricted Boltzmann Machine} %% 
+
+
+
+    \subsection{Restricted Boltzmann Machine}
+	\begin{frame}[t]{Concepts}
+% 	\txtcolb{}
+	 \begin{itemize}
+	  \itemsep10pt
+	  \item Generative graphical model, capture data distrbution $P(\x|\boldsymbol{\theta})$
+	  \item Trained in unsupervised way, only use unlabeled input sequence$\x$ for learning. 
+		  \begin{itemize}
+		   \item automatically extract useful features from data 
+		   \item Find hidden structure (distribution). 
+		   \item Learned features used for prediction or classification
+		  \end{itemize}
+	  \item Successfully applied in motion capture (Graham W. Taylor, Geoffrey E. Hinton, 2006)
+% 	  \item speicifies a joint distribution over input and hidden variables, can either generating data, or with bayesian
+% rule to form conditional distribution. 
+	  \item Potential to be extend to capture temporal information
+	 \end{itemize}
+
+
+	
+% 	\begin{minipage}[t]{\linewidth}
+% 	 $\x$, input units\\
+% 	 $\h$, hidden units
+% 	\end{minipage}
+
+	\end{frame}
+	
+	\begin{frame}[t]{Restricted Boltzmann Machine}
+	\txtcolb{Structure}
+	    \begin{figure}[t]
+	    \includegraphics[width=0.9\linewidth]{RBMStruct.png}
+	    \end{figure}
+	    \only<2->{
+	    \begin{minipage}{0.48\linewidth}
+	    \begin{align}
+	      \text{Energy Function:}~&E_{\boldsymbol{\theta}} = -\mathbf{x^{T}}\mathbf{W}\mathbf{h}-\mathbf{b^{T}}\mathbf{x}-\mathbf{c^{T}}\mathbf{h}\nonumber\\
+	    \text{Joint Distribution:}~&P^{RBM} (\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-E_{\boldsymbol{\theta}}(\mathbf{x},\mathbf{h})}\nonumber\\
+	     \text{Partition Function:}~ &Z = \sum_{\mathbf{x,h}} e^{-E_{\boldsymbol{\theta}}(\mathbf{x},\mathbf{h})}\nonumber\\
+	     \text{Free Energy:}~& \mathcal{F}(\mathbf{x}) = - \log \sum_h e^{-E(\mathbf{x,h})}\nonumber
+	    \end{align}
+	    \end{minipage}
+	    }
+	\end{frame}
+	\begin{frame}[t]{Inference}
+	\txtcolb{Inference}
+		\begin{minipage}[t]{0.48\linewidth}
+% 		\begin{figure}[t]
+			 \begin{align}
+			 &P(\mathbf{x}) = \sum_{\mathbf{h}} P(\mathbf{x,h})\nonumber\\ 
+			 &P (\mathbf{h}) = \sum_{\mathbf{x}} P(\mathbf{x,h})\nonumber\\
+			 \only<2->{&P (\h|\x)= \dfrac{P(\x,\h)}{P(\x)}\nonumber\\
+			 &P(\x|\h)= \dfrac{P(\x,\h)}{P(\h)}\nonumber\\}
+			 \only<3->{&P(h_{j}=1 \mid \mathbf{x})= sigmoid(\sum_{i} x_{i}W_{ij} + c_{j})\nonumber\\
+			 &P(x_{i}=1 \mid \mathbf{h}) = sigmoid(\sum_{j} W_{ij} h_{j} + b_{i})\nonumber}
+			 \notag
+			 \end{align}
+% 		\end{figure}
+	\end{minipage}
+% 	\begin{minipage}{0.48\linewidth}
+% % 		\begin{figure}[t]
+% 			\begin{eqnarray}
+% 			\end{eqnarray}
+% % 		\end{figure}
+% 	\end{minipage}
+
+	\vspace{5mm}
+	 
+	\end{frame}
+	\begin{frame}[t]{Conditional RBM}
+	    \only<1-2>{\begin{itemize}
+	     \item Linear input units with independent Gaussian noise
+	     \item Real-valued data, e.g. spectral features
+	    \end{itemize}
+	    }
+	    \only<2->{
+	    \begin{figure}[t]
+	    \includegraphics<2>[width=0.7\linewidth]{CRBM.png}
+	    \includegraphics<3>[scale = 0.2]{CRBM.png}
+	    \end{figure}
+	    }
+	    \only<3->{\begin{align}
+	      \text{Energy Function:}~&E^{CRBM}_{\boldsymbol{\theta}} (\mathbf{x}, \mathbf{h})  = \left\| \frac{\mathbf{x} - \tilde{\mathbf{b}}}{2} \right\|^{2}
+    -\tilde{\mathbf{c}}^T \mathbf{h}-\mathbf{x}^{T} \mathbf{W}\mathbf{h} \nonumber\\
+	      \text{Free Energy:}~&\mathcal{F}(\mathbf{x}) = \left\| \mathbf{x} - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\mathbf{x}\cdot \mathbf{W}})\nonumber\\
+	      &\tilde{\mathbf{b}} = \mathbf{b} + \mathbf{A}\cdot \mathbf{x}_{<t}\nonumber\\
+	      &\tilde{\mathbf{c}} = \mathbf{c} + \mathbf{B}\cdot \mathbf{x}_{<t}\nonumber\\
+	      &\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber
+	    \end{align}
+	    }
+
+
+	\end{frame}
+	
+	\begin{frame}[t]{Conditional RBM}
+	      \begin{align}
+		\text{Energy Function:}~&E^{CRBM}_{\boldsymbol{\theta}} (\mathbf{x}, \mathbf{h})  = \left\| \frac{\mathbf{x} - \tilde{\mathbf{b}}}{2} \right\|^{2}
+      -\tilde{\mathbf{c}}^T \mathbf{h}-\mathbf{x}^{T} \mathbf{W}\mathbf{h} \nonumber\\
+		\text{Free Energy:}~&\mathcal{F}(\mathbf{x}) = \left\| \mathbf{x} - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\mathbf{x}\cdot \mathbf{W}})\nonumber\\
+		&\tilde{\mathbf{b}} = \mathbf{b} + \mathbf{A}\cdot \mathbf{x}_{<t}\nonumber\\
+		&\tilde{\mathbf{c}} = \mathbf{c} + \mathbf{B}\cdot \mathbf{x}_{<t}\nonumber\\
+		&\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber
+	      \end{align}
+	\end{frame}
+	
+
+	
+	\begin{frame}{Training of Energy-based Model}
+	Optimization Method: \textcolor{red}{Maximum Likelihood}\\
+	\begin{align}P(\x) = \frac{e^{-\mathcal{F}(\x)}}{Z}\nonumber\end{align}
+	\begin{align}\label{loggra}
+	- \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} -
+	      \sum_{\tilde{\mathbf{x}}} P(\tilde{\mathbf{x}}) \
+		  \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber
+	\end{align}
+	\uncover<2->{
+	\begin{align}
+	 - \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} - \frac{1}{|\mathcal{N}|}
+       \sum_{\tilde{\mathbf{x}}\in \mathcal{N}} P(\tilde{\mathbf{x}}) \
+           \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber
+	\end{align}
+	}
+	\end{frame}
+	
+	\begin{frame}[t]{Training of Energy-based Model}
+% 		Sampling Method: \textcolor{red}{Gibbs Sampling}
+		\begin{minipage}{0.48\linewidth}
+		\begin{figure}
+		 \includegraphics[width=0.4\textwidth]{markov_chain.png}\\
+		 \includegraphics[width=0.4\textwidth]{markov_chain.png}\\
+		 \includegraphics[width=0.4\textwidth]{markov_chain.png}\\
+		 \includegraphics[width=0.4\textwidth]{markov_chain.png}
+		 \vdots
+		\end{figure}
+		\end{minipage}
+		\begin{minipage}{0.48\linewidth}
+		      \begin{eqnarray}
+			& \mathbf{x_{1}} \sim \hat{P}(\mathbf{x})\nonumber \\
+			& \mathbf{h_{1}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{1})\nonumber\\
+			& \mathbf{x_{2}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{1})\nonumber\\
+			& \mathbf{h_{2}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{2})\nonumber\\
+			& \vdots \\
+			& \mathbf{x_{t+1}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{t})\nonumber
+		      \end{eqnarray}
+		\end{minipage}
+	$t=1$, Gibbs step $\rightarrow$ \textcolor{red}{Constrastive Divergence}
+	\end{frame}
+
+
+
+  
+%% =========
+\section{Multilayer Neural Network}%4 folies
+	\subsection{Function and Training}		
+	\begin{frame}[t]{Structure and Function}
+	\txtcolb{N-hidden layers neural network }
+	  \begin{minipage}{0.45\linewidth}
+	      \begin{itemize}
+	       \itemsep10pt
+	       \item Hidden layer pre-activation:\\
+	       $\mathbf{a}(\x) =\mathbf{W}^{(1)}\x + \mathbf{b}^{(1)}$\\
+	       $a_{j}(\x) = \sum_i w_{ji}^{(1)}x_{i} + b_{j}^{(1)}$
+	       \item Hidden layer activation:\\
+	       $\h = f(\mathbf{a})$
+	       \item Output layer activation:\\
+	       $\hat{y}(\x) = o(\mathbf{W}^{(N+1)}\h^{(N)} + \mathbf{b}^{(N+1)} )$
+	      \end{itemize}
+	  \end{minipage}
+	  
+% 	  \begin{minipage}{0.45\linewidth}
+% 		\begin{figure}
+% 		      \includegraphics{}
+% 		\end{figure}
+% 	  \end{minipage}
+
+	\end{frame}
+	
+	\begin{frame}[t]{Training}
+		\textcolor{blue}{\Large Empirical Risk Minimization}
+		\begin{itemize}
+		 \item learning algorithms\\
+		 \begin{eqnarray}
+			\text{arg}~\underset{\btheta}{\mathrm{min}} \frac{1}{M}\sum_m l(\hat{y}(\x^{(m)};\btheta),y^{(m)}) + \lambda \Omega(\btheta)\nonumber
+			\end{eqnarray}
+		 \item loss function $l(\hat{y}(\x^{(m)};\btheta),y^{(m)})$ \\
+			for sigmoid activation $l(\btheta)= \sum_m \frac{1}{2} \left\| y^{(m)}-\hat{y}^{(m)}\right\| ^2$\\
+		 \item regularizer $\lambda \Omega(\btheta)$
+		\end{itemize}
+		
+		\txtcolb{Optimization}
+		\begin{itemize}
+		 \item Gradient calculation with Backpropagation
+		 \item Stochastic/Mini-batch gradient descent
+		\end{itemize}
+
+		
+		
+	\end{frame}
+	
+	
+	\subsection{Problems and Solutions}
+		
+	\begin{frame}[t]{Pre-training}
+		\begin{minipage}[h]{\linewidth}
+		\txtcolb{Vanishing Gradient}
+			\begin{itemize}
+				\item Training time increases as network gets deeper
+				\item Gradient shrink exponentially and training end up local minima
+				\item Caused by random initialization of network parameters
+			\end{itemize}
+		\end{minipage}\vspace{5mm}
+		\begin{minipage}[h]{\linewidth}
+		\visible<2->{
+		\txtcolb{Unsupervised layerwise pre-training}
+		\begin{itemize}
+		 \itemsep8pt
+		 \item Pretrain the deep network layer by layer to build a stacked auto-encoder
+		 \item Each layer is trained as a single hidden layer auto-encoder by minimizing average reconstruction error:\\
+		      $\mathrm{min}~l_{AE} = \sum_m \frac{1}{2}\left\|\x^{(m)}-\hat{\x}^{(m)}\right\|^2$
+		 \item Fine-tuning the entire deep network with supervised training
+		\end{itemize}
+		}
+		\end{minipage}		
+	\end{frame}
+
+% 		\begin{itemize}
+% 			\item Optimization problem non-convex\\
+% 			$\Rightarrow$ getting stuck in poor local minima
+% 			\item Diffusion of gradients
+% 			\item Large p small n problem $\Rightarrow$ overfitting
+% 	
+% 	\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%Noob pictures for pretraining%%%%%%%%%%%%%%%
+	\begin{frame}[t]{Pre-training}
+	 \includegraphics[width=0.9\linewidth]{layerwisewhole.png}
+	\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	
+	\begin{frame}[t]{Regularization}
+		\begin{minipage}[h]{\linewidth}
+		\txtcolb{Overfitting}
+			\begin{itemize}
+				\item Huge amount of parameters in deep network
+				\item Not enough data for training
+				\item Poor generalization 
+			\end{itemize}
+		\end{minipage}\vspace{5mm}
+		\visible<2->{
+		\begin{minipage}[h]{\linewidth}
+		\txtcolb{Regularization}
+			\begin{itemize}
+			\item Add weight penalization $\lambda \left\| \mathbf{w} \right\| _{p}$ to loss function 
+			      \begin{eqnarray}
+			      \text{arg}~\underset{\btheta}{\mathrm{min}} \frac{1}{M}\sum_m l(\hat{y}(\x^{(m)};\btheta),y^{(m)}) + \lambda \left\| \mathbf{w} \right\| _{p}\nonumber
+			      \end{eqnarray}
+			\item 	In convex optimization:
+	 		\begin{eqnarray}
+			\text{arg}~\underset{\btheta}{\mathrm{min}} \frac{1}{M}\sum_m l(\hat{y}(\x^{(m)};\btheta),y^{(m)}),  s.t. \left\|\mathbf{w}\right\|_p \leq C\nonumber
+			\end{eqnarray}
+			\end{itemize}
+		\end{minipage}	
+		}
+	\end{frame}
+	
+	\begin{frame}[t]{Regularization}
+	\txtcolb{P-Norm}
+	\begin{eqnarray}
+			      \left\| \mathbf{w} \right\| _{p} := \left( \sum_{n=1}^{n} |w_{i}|^{p} \right) ^{1/p} = \sqrt[p]{|w_1|^p +,..., +|w_n|^p}\nonumber
+	\end{eqnarray}
+	Widely used: L1- and L2-regularization ($p=1$ and $p=2$)
+	\begin{figure}[t]
+	\includegraphics<1>[width=0.7\linewidth]{contoursreg.png}
+	\includegraphics<2>[width=0.7\linewidth]{l1vsl2.png}
+% 	 \only<1-1>{\includegraphics[width=0.7\linewidth]{contoursreg.png}}
+% 	 \only<2->{\includegraphics[width=0.7\linewidth]{l1vsl2.png}}
+	\end{figure}
+
+	\end{frame}
+
+
+\section{Long Short Term Memory}
+	\subsection{Recurrent Neural Network}
+		\begin{frame}[t]{Recurrent Neural Network}
+% 			\begin{minipage}[t][][t]{0.48\linewidth}
+			\textcolor{blue}{\Large Concepts of RNN}
+				\begin{itemize}[<+->]
+% 				 \itemsep10pt
+				 \item modelling sequential data, emotion in speech .
+				 \item Same Structure as MLP but differs from feed-forward network, enabling
+nonlinear mapping
+				 \only<2-2>{
+					\begin{eqnarray}
+						&h_{t} = \mathcal{H}(W_{xh}x_{t}+W_{hh}h_{t-1} + b_{h})\nonumber\\
+						&y_{t} = W_{hy}h_{t} + b_{y}\nonumber
+					\end{eqnarray}
+				 }
+				
+				 \item Feedback connection between previous hidden units and current hidden units, enabling
+memory past hidden state.
+				 \item Potentially to model arbitary dynamic system.
+				 \item Trained with \textbf{b}ack\textbf{p}ropagation \textbf{t}hrough \textbf{t}ime (BPTT)
+				 \note{natural extension of BP in FF network}
+				\end{itemize}
+% 			\end{minipage}
+\vspace{5mm}
+% 		\only<1>{\begin{figure}
+% 		          \includegraphics[width=0.5\textwidth]{NeuralNetwork.png}
+% 		         \end{figure}
+% 
+% 		}
+		\end{frame}
+		
+		\begin{frame}[t]{Recurrent Neural Network}
+% 			\begin{minipage}[t][][t]{0.48\linewidth}
+			\textcolor{blue}{\Large Concepts of RNN}
+			\begin{minipage}[t]{0.48\linewidth}
+				\only<1>{
+				\begin{figure}[t]
+				\includegraphics[width=0.8\textwidth]{RNNunit.png}
+				\end{figure}
+				}
+			\end{minipage}\hfill
+			\begin{minipage}[t]{0.48\linewidth}
+				\only<1>{
+				\begin{figure}[t]
+				\includegraphics[width=\textwidth]{RNNStruct.png}
+				\end{figure}
+				}
+			\end{minipage}
+
+		\end{frame}
+		
+		\begin{frame}[t]{From RNN to LSTM}
+		\textcolor{blue}{\Large Problems with RNN}
+			\begin{itemize}%[<+->]
+			 \item gradient vanishing during backpropagation as time steps increases (>100)
+			 \item difficult to capture long-time dependency (which is required in emotion recognition)
+			\end{itemize}
+		\textcolor{red}{\Large Solutions}	
+			\begin{itemize}
+			 \item 
+			\end{itemize}
+    
+    
+		\end{frame}
+		\begin{frame}{Long short term memory}
+		\only<1>{S. Hochreiter and J. Schmidhuber, Lovol. 9, pp. 1735-1780, 1997.}
+		\uncover<2->{
+		\textcolor{blue}{\Large LSTM unit}\\
+		\begin{minipage}{0.4\linewidth}
+			\begin{figure}
+			 \includegraphics[width=\linewidth]{LSTMstruct.png}
+			\end{figure}
+		\end{minipage}
+		\begin{minipage}[t]{0.55\linewidth}
+			\begin{figure}
+			 \begin{eqnarray}
+				  i_{t} &=& \sigma (W_{xi}x_{t} + W_{hi}h_{t-1} + W_{ci}c_{t-1} +b_{i})\nonumber\\
+				  f_{t} &=& \sigma (W_{xf}x_{t} + W_{hf}h_{t-1} + W_{cf}c_{t-1} +b_{f})\nonumber\\
+				  c_{t} &=& f_{t}c_{t-1} + i_{t}\mathrm{tanh}(W_{xc}x_{t} + W_{hc}h_{t-1} + b_{c})\nonumber\\
+				  o_{t} &=& \sigma (W_{xo}x_{t} + W_{ho}h_{t-1} + W_{co}c_{t} +b_{o})\nonumber\\
+				  h_{t} &=& o_{t}\mathrm{tanh} (c_{t})\nonumber
+			 \end{eqnarray}
+			\end{figure}
+		\end{minipage}
+
+		}
+		\end{frame}
+		
+		\begin{frame}[t]{Long short term memory}
+		\textcolor{blue}{\Large Features in LSTM}
+		 \begin{itemize}
+		  \item gates are trained to learn when it shoud be open/closed. 
+		  \item Constant Error Carousel
+		  \item preserve long-time dependency by maintaining gradient over time. 
+		 \end{itemize}
+		 \begin{figure}
+		  \includegraphics[width=\textwidth]{LSTMGra.png}
+		 \end{figure}
+
+
+		\end{frame}
+
+% \section{Experiments}
+% 	\begin{frame}[t]{Experiment Setup}
+% 	\begin{minipage}[t]{\linewidth}
+% 	 \begin{itemize}[<+->]
+% 	  \item<only@1> CRBM-DNN 
+% 	  \item<only@2> CRBM-LSTM
+% 	  \item<only@3> LSTM
+% 	  \item<only@4> LSTM with rectifier units
+% 	\end{itemize}
+% 	\end{minipage}\hspace{5mm}
+% 	
+% 	\begin{minipage}[t]{\linewidth}
+% 	    \begin{figure}[b]
+% 	    \only<1>{\includegraphics[width=\linewidth]{CRBMDNN.png}}
+% 	    \only<2>{\includegraphics[width=.8\linewidth]{CRBMLSTM.png}}
+% 	    \only<3>{\includegraphics[width=.8\linewidth]{LSTMpure.png}}
+% 	    \only<4>{\includegraphics[width=.8\linewidth]{LSTM.png}}
+% 	  \end{figure}
+% 	\end{minipage}
+% 
+% 	\end{frame}
+% 	
+% 	\begin{frame}[t]{Result}
+% 	      \only<1>
+% 	      {
+% 	      \begin{table}[htbp]\centering
+% 		  \centering
+% 		  Confusion matrix of CRBM-DNN result
+% 		  \vspace{10mm}
+% 		  \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
+% 		      \toprule
+% 		      & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
+% 		  %     \midrule
+% 		      \multirow{5}{*}{\textit{True}}
+% 		      & & Joy & Neutral & Sadness & Anger \\
+% 		  %     \cmidrule{2-12}
+% 		      & Joy             &\textcolor{red}{57.7\%} &1.4\%   		  & 0.0\%		& 40.8\%\\
+% 		      & Neutral         & 17.7\%			&\textcolor{red}{54.4\%} &25.3\%   	&2.5\%     \\
+% 		  %     \rot{\rlap{~\textit{{True}}}}
+% 		      & Sadness         &1.6\%			&27.9\%   		  &\textcolor{red}{70.5\%}   &0.0\%    \\
+% 		      & Anger           & 39.4\%			&1.6\%  		  &0.0\%   	&\textcolor{red}{59.1\%}    \\
+% 		      \midrule
+% 		      & \multicolumn{5}{c}{recognition rate:59.76\%}\\
+% 		      \bottomrule
+% 		  %     \cmidrule[1pt]{2-12}
+% 		    \end{tabular*}
+% 		  \label{tab:CRBMDNN}
+% 	      \end{table}
+% 	      }
+% 	      \only<2>
+% 	      {
+% 		\begin{table}[htbp]\centering
+% 		\centering
+% 		Confusion matrix of CRBM-LSTM result
+% 		\vspace{10mm}
+% 		\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
+% 		    \toprule
+% 		    & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
+% 		%     \midrule
+% 		    \multirow{5}{*}{\textit{True}}
+% 		    & & Joy & Neutral & Sadness & Anger \\
+% 		%     \cmidrule{2-12}
+% 		    & Joy             &\textcolor{red}{11.3\%} &9.9\%   		  &   2.8\%	&    76.1\%\\
+% 		    & Neutral         & 0.0\%			&\textcolor{red}{72.2\%} &17.7\%   	&10.1\%     \\
+% 		%     \rot{\rlap{~\textit{{True}}}}
+% 		    & Sadness         &0.0\%			&4.8\%   		  &\textcolor{red}{88.7\%}   &6.5\%    \\
+% 		    & Anger           & 0.8\%			&1.6\%  		  &0.0\%   	&\textcolor{red}{97.6\%}    \\
+% 		    \midrule
+% 		    & \multicolumn{5}{c}{recognition rate: 71.98\%}\\
+% 		    \bottomrule
+% 		%     \cmidrule[1pt]{2-12}
+% 		  \end{tabular*}
+% 		\label{tab:CRBMLSTM}
+% 		\end{table}
+% 	      }
+% 	      \only<3>
+% 	      {
+% 		\begin{table}[htbp]\centering
+% 		\centering
+% 		Confusion matrix of pure LSTM result
+% 		\vspace{10mm}
+% 		\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
+% 		    \toprule
+% 		    & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
+% 		%     \midrule
+% 		    \multirow{5}{*}{\textit{True}}
+% 		    & & Joy & Neutral & Sadness & Anger \\
+% 		%     \cmidrule{2-12}
+% 		    & Joy             &\textcolor{red}{66.2\%} &4.2\%   		  &   0.0\%	&    29.6\%\\
+% 		    & Neutral         &6.3\%			&\textcolor{red}{79.7\%} &10.2\%   	&3.8\%     \\
+% 		%     \rot{\rlap{~\textit{{True}}}}
+% 		    & Sadness         &0.0\%			&19.7\%   		  &\textcolor{red}{80.3\%}   &0.0\%    \\
+% 		    & Anger           & 12.6\%			&0.8\%  		  &0.0\%   	&\textcolor{red}{86.6\%}    \\
+% 		    \midrule
+% 		    & \multicolumn{5}{c}{recognition rate: 81.59\%}\\
+% 		    \bottomrule
+% 		%     \cmidrule[1pt]{2-12}
+% 		  \end{tabular*}
+% 		\label{tab:pureLSTM}
+% 		\end{table}
+% 	      }
+% 	      \only<4>
+% 	      {
+% 		\begin{table}[htbp]\centering
+% 		\centering
+% 		Confusion matrix of LSTM-Rectifier result
+% 		\vspace{10mm}
+% 		\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
+% 		    \toprule
+% 		    & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
+% 		%     \midrule
+% 		    \multirow{5}{*}{\textit{True}}
+% 		    & & Joy & Neutral & Sadness & Anger \\
+% 		%     \cmidrule{2-12}
+% 		    & Joy             &\textcolor{red}{57.7\%} &7.0\%   		  &   0.0\%	&    35.2\%\\
+% 		    & Neutral         &6.3\%			&\textcolor{red}{86.1\%} &6.3\%   	&1.3\%     \\
+% 		%     \rot{\rlap{~\textit{{True}}}}
+% 		    & Sadness         &0.0\%			&6.6\%   		  &\textcolor{red}{93.4\%}   &0.0\%    \\
+% 		    & Anger           & 8.7\%			&0.0\%  		  &0.0\%   	&\textcolor{red}{91.3\%}    \\
+% 		    \midrule
+% 		    & \multicolumn{5}{c}{recognition rate: 83.43\%}\\
+% 		    \bottomrule
+% 		%     \cmidrule[1pt]{2-12}
+% 		  \end{tabular*}
+% 		\label{tab:LSTMRec}
+% 		\end{table}
+% 	      }
+% 	\end{frame}
+
+
+
+\section{Conclusion and Outlook}
+      \begin{frame}[t]{Conclusion}
+	  \begin{itemize}
+	  \itemsep10pt
+	  \item Model with long-term dependencies shall be used for speech emotion
+	  \item CRBM is appropriate for short-term modelling, but not for long-term variation
+	  \item LSTM is good at modelling long time dependency 
+	  \item Frame-based classification can also reach good result
+		\vspace{5mm}
+		\begin{itemize}
+		 \itemsep10pt
+		 \item CRBM-LSTM $71.98\%$
+		 \item LSTM $81.59\%$
+		 \item LSTM with rectifier layers $83.43\%$
+		\end{itemize}
+	  \end{itemize}
+      \end{frame}
+      
+      \begin{frame}[t]{Outlook}
+	  \begin{itemize}
+	   \item Stacking CRBM to form deeper structure
+	   \item Traing CRBM with more/larger data base 
+	   \item Second order optimization to speed up learning process
+	   \item Bi-directional LSTM, capturing future dependencies
+	  \end{itemize}
+
+      \end{frame}
+
+      \begin{frame}{End}
+	\Large Thank You!
+      \end{frame}
+
+
+
+\end{document}
