@@ -45,8 +45,12 @@
 
 \usepackage{setspace}
 \usepackage{graphicx}
+\usepackage{amsmath}
 \usepackage{pgfpages}
+\usepackage{subfigure}
+\usepackage{colortbl}
 \graphicspath{ {../Fig/} }
+\usepackage[beamer]{hf-tikz}
 \usepackage{tikz}
 % \setbeameroption{show notes on second screen=left}
 % \setbeameroption{second mode text on second screen=left}
@@ -290,46 +294,99 @@
 	
 
 	
-	\begin{frame}{Training of Energy-based Model}
-	Optimization Method: \textcolor{red}{Maximum Likelihood}\\
-	\begin{align}P(\x) = \frac{e^{-\mathcal{F}(\x)}}{Z}\nonumber\end{align}
-	\begin{align}\label{loggra}
-	- \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} -
-	      \sum_{\tilde{\mathbf{x}}} P(\tilde{\mathbf{x}}) \
-		  \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber
-	\end{align}
-	\uncover<2->{
-	\begin{align}
-	 - \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} - \frac{1}{|\mathcal{N}|}
-       \sum_{\tilde{\mathbf{x}}\in \mathcal{N}} P(\tilde{\mathbf{x}}) \
-           \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber
-	\end{align}
-	}
+	\begin{frame}[t]{Training of Energy-based Model}
+		 Optimization Method: \alert<1-1>{Maximum Likelihood}\\
+		\uncover<1-2>{
+		\begin{columns}
+		 \column{3in}
+		\begin{align}
+			    P(\x) = \frac{e^{-\mathcal{F}(\x)}}{Z}\nonumber
+		\end{align}
+		\column{1.5in}
+		Free Energy
+		\end{columns}
+		}
+		\only<2->{
+		\begin{columns}
+		\column{3in}
+		\begin{align}\label{loggra}
+			- \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} -\alert<3->{
+			      \sum_{\tilde{\mathbf{x}}} P(\tilde{\mathbf{x}})
+				  \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber}
+		\end{align}
+		\only<3->{\column{1.5in}
+% 		\[ \xleftarrow{\hspace*{3mm}} \]
+		$\leftarrow$intractable!}
+		\end{columns}
+		}
+		\only<4->{
+		\begin{columns}
+		\column{3in}
+		  \begin{align}
+			- \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} - \alert<4-4>{ \frac{1}{|\mathcal{N}|}
+		      \sum_{\tilde{\mathbf{x}}\in \mathcal{N}} P(\tilde{\mathbf{x}})
+			  \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber}
+		  \end{align}
+		 \column{1.5in}
+		 sampling
+		  \end{columns}
+		  }
 	\end{frame}
 	
 	\begin{frame}[t]{Training of Energy-based Model}
-% 		Sampling Method: \textcolor{red}{Gibbs Sampling}
-		\begin{minipage}{0.48\linewidth}
-		\begin{figure}
-		 \includegraphics[width=0.4\textwidth]{markov_chain.png}\\
-		 \includegraphics[width=0.4\textwidth]{markov_chain.png}\\
-		 \includegraphics[width=0.4\textwidth]{markov_chain.png}\\
-		 \includegraphics[width=0.4\textwidth]{markov_chain.png}
-		 \vdots
-		\end{figure}
-		\end{minipage}
-		\begin{minipage}{0.48\linewidth}
-		      \begin{eqnarray}
-			& \mathbf{x_{1}} \sim \hat{P}(\mathbf{x})\nonumber \\
-			& \mathbf{h_{1}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{1})\nonumber\\
-			& \mathbf{x_{2}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{1})\nonumber\\
-			& \mathbf{h_{2}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{2})\nonumber\\
-			& \vdots \\
-			& \mathbf{x_{t+1}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{t})\nonumber
-		      \end{eqnarray}
-		\end{minipage}
-	$t=1$, Gibbs step $\rightarrow$ \textcolor{red}{Constrastive Divergence}
+% % 		Sampling Method: \textcolor{red}{Gibbs Sampling}
+		\txtcolb{MCMC-Gibbs Sampling}
+		\begin{columns}[c]
+			  \column{1.5in}
+			\uncover<1-1>{\begin{align}
+			      & \mathbf{x_{1}} \sim \hat{P}(\mathbf{x})\nonumber \\
+			      & \mathbf{h_{1}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{1})\nonumber	
+			\end{align}
+			}
+			\uncover<2-2>{
+			\begin{align}
+				  & \mathbf{x_{2}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{1})\nonumber\\
+				  & \mathbf{h_{2}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{2})\nonumber
+			\end{align}
+			}
+			\uncover<3-3>{
+			\begin{align}
+				& \vdots \nonumber\\
+				& \mathbf{x_{t+1}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{t})\nonumber	
+			\end{align}
+			}
+
+			  \column{3in}
+			  \framebox{\includegraphics<1>[width=\textwidth]{markov_chain.png}
+				    \includegraphics<2>[width=\textwidth]{markov_chain2.png}
+				    \includegraphics<3>[width=\textwidth]{markov_chaint.png}
+				    }
+		\end{columns}
+% 		\only<2->{
+% 		\begin{columns}[c]
+% 			  \column{1.5in}
+% 
+% 			  \column{1.5in}
+% 			  \framebox{\includegraphics[width=\textwidth]{markov_chain2.png}}
+% 		\end{columns}
+% 		}
+% 		\only<3->{
+% 		\begin{columns}[c]
+% 			  \column{1.5in}
+% 
+% 			  \column{1.5in}
+% 			  \framebox{\includegraphics[width=\textwidth]{markov_chaint.png}}
+% 		\end{columns}
+% 		}
+% 		
+% 	\only<4->{$t=1$, Gibbs step $\rightarrow$ \textcolor{red}{Constrastive Divergence}}
 	\end{frame}
+	
+	\begin{frame}[t]{Contrastive Divergence}
+	 $t=1$, Gibbs step $\rightarrow$ \textcolor{red}{Constrastive Divergence}
+	 
+	\end{frame}
+
 
 
 
@@ -395,6 +452,12 @@
 			\end{itemize}
 		\end{minipage}\vspace{5mm}
 		\begin{minipage}[h]{\linewidth}
+		\only<1-1>{
+		\begin{figure}
+		 \includegraphics[width=0.6\textwidth]{GradVanishing.png}
+		\end{figure}
+
+		}
 		\visible<2->{
 		\txtcolb{Unsupervised layerwise pre-training}
 		\begin{itemize}

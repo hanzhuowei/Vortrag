@@ -46,7 +46,10 @@
 \usepackage{setspace}
 \usepackage{graphicx}
 \usepackage{pgfpages}
+\usepackage{subfigure}
+\usepackage{colortbl}
 \graphicspath{ {../Fig/} }
+\usepackage[beamer]{hf-tikz}
 \usepackage{tikz}
 % \setbeameroption{show notes on second screen=left}
 % \setbeameroption{second mode text on second screen=left}
@@ -138,8 +141,8 @@
 				\begin{figure}
 
 				\begin{eqnarray}
-				f_{mel} = 1125~\ln~(1+f_{Hz}/700)\\
-				f_{Hz} = 700 \left(\exp(f_{mel}/1125)-1\right)
+				f_{mel} = 1125~\ln~(1+f_{Hz}/700)\nonumber\\
+				f_{Hz} = 700 \left(\exp(f_{mel}/1125)-1\right)\nonumber
 				\end{eqnarray}
 
 			\end{figure}
@@ -171,7 +174,7 @@
 	   \item learning representations from high-dim data
 	   \item extracting appropriate features without hand-crafting
 	   \item low-level features are used to build high-level features as network gets deeper
-	   \item frame-based classfication
+	   \item frame-based classification
 	  \end{itemize}
 
 	\end{minipage}
@@ -182,28 +185,23 @@
 \section{Conditional Restricted Boltzmann Machine} %% 
 
 
-    \subsection{Product of Experts}
-	\begin{frame}{Product of Experts}
-	 
-	\end{frame}
 
     \subsection{Restricted Boltzmann Machine}
-	\begin{frame}[t]{Character}
+	\begin{frame}[t]{Concepts}
 % 	\txtcolb{}
 	 \begin{itemize}
+	  \itemsep10pt
 	  \item Generative graphical model, capture data distrbution $P(\x|\boldsymbol{\theta})$
-	  \item Successfully applied in motion capture (Graham W. Taylor, Geoffrey E. Hinton, 2006)
-	  \item Trained in unsupervised way, only use unlabeled input sequence$\x$ for learning. \note{clustering, mixture models,PoE}
+	  \item Trained in unsupervised way, only use unlabeled input sequence$\x$ for learning. 
 		  \begin{itemize}
 		   \item automatically extract useful features from data 
 		   \item Find hidden structure (distribution). 
 		   \item Learned features used for prediction or classification
 		  \end{itemize}
+	  \item Successfully applied in motion capture (Graham W. Taylor, Geoffrey E. Hinton, 2006)
 % 	  \item speicifies a joint distribution over input and hidden variables, can either generating data, or with bayesian
 % rule to form conditional distribution. 
 	  \item Potential to be extend to capture temporal information
-	  \item Binary Units of input and outpu layer
-	  \item No interconnections within the same layer
 	 \end{itemize}
 
 
@@ -215,11 +213,12 @@
 
 	\end{frame}
 	
-	\begin{frame}{Restricted Boltzmann Machine}
+	\begin{frame}[t]{Restricted Boltzmann Machine}
 	\txtcolb{Structure}
 	    \begin{figure}[t]
-	    \includegraphics[width=0.5\linewidth]{RBMStruct.png}
+	    \includegraphics[width=0.9\linewidth]{RBMStruct.png}
 	    \end{figure}
+	    \only<2->{
 	    \begin{minipage}{0.48\linewidth}
 	    \begin{align}
 	      \text{Energy Function:}~&E_{\boldsymbol{\theta}} = -\mathbf{x^{T}}\mathbf{W}\mathbf{h}-\mathbf{b^{T}}\mathbf{x}-\mathbf{c^{T}}\mathbf{h}\nonumber\\
@@ -228,20 +227,22 @@
 	     \text{Free Energy:}~& \mathcal{F}(\mathbf{x}) = - \log \sum_h e^{-E(\mathbf{x,h})}\nonumber
 	    \end{align}
 	    \end{minipage}
-	    
+	    }
 	\end{frame}
+	
 	\begin{frame}[t]{Inference}
 	\txtcolb{Inference}
 		\begin{minipage}[t]{0.48\linewidth}
 % 		\begin{figure}[t]
-			 \begin{eqnarray}
-			 &P(\mathbf{x}) = \sum_{\mathbf{h}} P(\mathbf{x,h})\nonumber\\
+			 \begin{align}
+			 &P(\mathbf{x}) = \sum_{\mathbf{h}} P(\mathbf{x,h})\nonumber\\ 
 			 &P (\mathbf{h}) = \sum_{\mathbf{x}} P(\mathbf{x,h})\nonumber\\
-			 &P (\h|\x)= \frac{P(\x,\h)}{P(\x)}\nonumber\\
-			 &P(\x|\h)= \frac{P(\x,\h)}{P(\h)}\nonumber\\
-			 &P(h_{j}=1 \mid \mathbf{x})= sigmoid(\sum_{i} x_{i}W_{ij} + c_{j})\nonumber\\
-			 &P(x_{i}=1 \mid \mathbf{h}) = sigmoid(\sum_{j} W_{ij} h_{j} + b_{i})\nonumber
-			 \end{eqnarray}
+			 \only<2->{&P (\h|\x)= \dfrac{P(\x,\h)}{P(\x)}\nonumber\\
+			 &P(\x|\h)= \dfrac{P(\x,\h)}{P(\h)}\nonumber\\}
+			 \only<3->{&P(h_{j}=1 \mid \mathbf{x})= sigmoid(\sum_{i} x_{i}W_{ij} + c_{j})\nonumber\\
+			 &P(x_{i}=1 \mid \mathbf{h}) = sigmoid(\sum_{j} W_{ij} h_{j} + b_{i})\nonumber}
+			 \notag
+			 \end{align}
 % 		\end{figure}
 	\end{minipage}
 % 	\begin{minipage}{0.48\linewidth}
@@ -254,16 +255,26 @@
 	\vspace{5mm}
 	 
 	\end{frame}
-	\begin{frame}{Conditional RBM}
-	    \begin{itemize}
-	     \item<1->Linear input units with independent Gaussian noise \pause
-	     \item<2>Real-valued data, e.g. spectral features
+	\begin{frame}[t]{Conditional RBM}
+	    \only<1-2>{\begin{itemize}
+	     \item Linear input units with independent Gaussian noise
+	     \item Real-valued data, e.g. spectral features
 	    \end{itemize}
-	    \only<3>{
-	    
+	    }
+	    \only<2->{
 	    \begin{figure}[t]
-	    \includegraphics[width=0.7\linewidth]{CRBM.png}
+	    \includegraphics<2>[width=0.7\linewidth]{CRBM.png}
+	    \includegraphics<3>[scale = 0.2]{CRBM.png}
 	    \end{figure}
+	    }
+	    \only<3->{\begin{align}
+	      \text{Energy Function:}~&E^{CRBM}_{\boldsymbol{\theta}} (\mathbf{x}, \mathbf{h})  = \left\| \frac{\mathbf{x} - \tilde{\mathbf{b}}}{2} \right\|^{2}
+    -\tilde{\mathbf{c}}^T \mathbf{h}-\mathbf{x}^{T} \mathbf{W}\mathbf{h} \nonumber\\
+	      \text{Free Energy:}~&\mathcal{F}(\mathbf{x}) = \left\| \mathbf{x} - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\mathbf{x}\cdot \mathbf{W}})\nonumber\\
+	      &\tilde{\mathbf{b}} = \mathbf{b} + \mathbf{A}\cdot \mathbf{x}_{<t}\nonumber\\
+	      &\tilde{\mathbf{c}} = \mathbf{c} + \mathbf{B}\cdot \mathbf{x}_{<t}\nonumber\\
+	      &\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber
+	    \end{align}
 	    }
 
 
@@ -282,46 +293,90 @@
 	
 
 	
-	\begin{frame}{Training of Energy-based Model}
-	Optimization Method: \textcolor{red}{Maximum Likelihood}\\
-	\begin{align}P(\x) = \frac{e^{-\mathcal{F}(\x)}}{Z}\nonumber\end{align}
-	\begin{align}\label{loggra}
-	- \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} -
-	      \sum_{\tilde{\mathbf{x}}} P(\tilde{\mathbf{x}}) \
-		  \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber
-	\end{align}
-	\uncover<2->{
-	\begin{align}
-	 - \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} - \frac{1}{|\mathcal{N}|}
-       \sum_{\tilde{\mathbf{x}}\in \mathcal{N}} P(\tilde{\mathbf{x}}) \
-           \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber
-	\end{align}
-	}
+	\begin{frame}[t]{Training of Energy-based Model}
+		 Optimization Method: \alert<1-1>{Maximum Likelihood}\\
+		\begin{columns}
+		\column{2in}
+		\uncover<1-2>{
+		\begin{align}
+			    P(\x) = \frac{e^{-\mathcal{F}(\x)}}{Z}\nonumber
+		\end{align}
+		}
+		\only<2->{
+		\begin{align}\label{loggra}
+			- \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} -\alert<2->{
+			      \sum_{\tilde{\mathbf{x}}} P(\tilde{\mathbf{x}})
+				  \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber}
+		\end{align}
+		}
+		\only<3->{
+		  \begin{align}
+			- \frac{\partial  \log P(\mathbf{x})}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} - \alert<3-3>{ \frac{1}{|\mathcal{N}|}
+		      \sum_{\tilde{\mathbf{x}}\in \mathcal{N}} P(\tilde{\mathbf{x}})
+			  \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber}
+		  \end{align}
+		  }
+		 \column{1.5in}
+		 \uncover<1-2>{Free Energy}\\
+		 \only<2-2>{$\leftarrow$}\\
+		 \only<3->{Sampling}
+		\end{columns}
 	\end{frame}
 	
 	\begin{frame}[t]{Training of Energy-based Model}
-% 		Sampling Method: \textcolor{red}{Gibbs Sampling}
-		\begin{minipage}{0.48\linewidth}
-		\begin{figure}
-		 \includegraphics[width=0.4\textwidth]{markov_chain.png}\\
-		 \includegraphics[width=0.4\textwidth]{markov_chain.png}\\
-		 \includegraphics[width=0.4\textwidth]{markov_chain.png}\\
-		 \includegraphics[width=0.4\textwidth]{markov_chain.png}
-		 \vdots
-		\end{figure}
-		\end{minipage}
-		\begin{minipage}{0.48\linewidth}
-		      \begin{eqnarray}
-			& \mathbf{x_{1}} \sim \hat{P}(\mathbf{x})\nonumber \\
-			& \mathbf{h_{1}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{1})\nonumber\\
-			& \mathbf{x_{2}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{1})\nonumber\\
-			& \mathbf{h_{2}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{2})\nonumber\\
-			& \vdots \\
-			& \mathbf{x_{t+1}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{t})\nonumber
-		      \end{eqnarray}
-		\end{minipage}
-	$t=1$, Gibbs step $\rightarrow$ \textcolor{red}{Constrastive Divergence}
+% % 		Sampling Method: \textcolor{red}{Gibbs Sampling}
+		\txtcolb{MCMC-Gibbs Sampling}
+		\begin{columns}[c]
+			  \column{1.5in}
+			\uncover<1-1>{\begin{align}
+			      & \mathbf{x_{1}} \sim \hat{P}(\mathbf{x})\nonumber \\
+			      & \mathbf{h_{1}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{1})\nonumber	
+			\end{align}
+			}
+			\uncover<2-2>{
+			\begin{align}
+				  & \mathbf{x_{2}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{1})\nonumber\\
+				  & \mathbf{h_{2}} \sim \hat{P}(\mathbf{h}|\mathbf{x}_{2})\nonumber
+			\end{align}
+			}
+			\uncover<3-3>{
+			\begin{align}
+				& \vdots \nonumber\\
+				& \mathbf{x_{t+1}} \sim \hat{P}(\mathbf{x}|\mathbf{h}_{t})\nonumber	
+			\end{align}
+			}
+
+			  \column{3in}
+			  \framebox{\includegraphics<1>[width=\textwidth]{markov_chain.png}
+				    \includegraphics<2>[width=\textwidth]{markov_chain2.png}
+				    \includegraphics<3>[width=\textwidth]{markov_chaint.png}
+				    }
+		\end{columns}
+% 		\only<2->{
+% 		\begin{columns}[c]
+% 			  \column{1.5in}
+% 
+% 			  \column{1.5in}
+% 			  \framebox{\includegraphics[width=\textwidth]{markov_chain2.png}}
+% 		\end{columns}
+% 		}
+% 		\only<3->{
+% 		\begin{columns}[c]
+% 			  \column{1.5in}
+% 
+% 			  \column{1.5in}
+% 			  \framebox{\includegraphics[width=\textwidth]{markov_chaint.png}}
+% 		\end{columns}
+% 		}
+% 		
+% 	\only<4->{$t=1$, Gibbs step $\rightarrow$ \textcolor{red}{Constrastive Divergence}}
 	\end{frame}
+	
+	\begin{frame}[t]{Contrastive Divergence}
+	 $t=1$, Gibbs step $\rightarrow$ \textcolor{red}{Constrastive Divergence}
+	 
+	\end{frame}
+
 
 
 
@@ -387,6 +442,12 @@
 			\end{itemize}
 		\end{minipage}\vspace{5mm}
 		\begin{minipage}[h]{\linewidth}
+		\only<1-1>{
+		\begin{figure}
+		 \includegraphics[width=0.6\textwidth]{GradVanishing.png}
+		\end{figure}
+
+		}
 		\visible<2->{
 		\txtcolb{Unsupervised layerwise pre-training}
 		\begin{itemize}
