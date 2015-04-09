@@ -256,10 +256,13 @@
 	\vspace{5mm}
 	 
 	\end{frame}
+ \subsection{CRBM}
 	\begin{frame}[t]{Conditional RBM}
-	    \only<1-2>{\begin{itemize}
-	     \item Linear input units with independent Gaussian noise
-	     \item Real-valued data, e.g. spectral features
+	    \only<1-2>{
+	    \begin{itemize}
+	     \item Consider visible units from previous time step as additional bias for current visible and hidden layer
+	     \item $A$ and $B$ are weight parameter of visible (history) - visible and visible (history) - hidden connections
+	     \item Visible layer is linear units with independent Gaussian noise to model real-valued data, e.g. spectral features
 	    \end{itemize}
 	    }
 	    \only<2->{
@@ -271,10 +274,10 @@
 	    \only<3->{\begin{align}
 	      \text{Energy Function:}~&E^{CRBM}_{\boldsymbol{\theta}} (\mathbf{x}, \mathbf{h})  = \left\| \frac{\mathbf{x} - \tilde{\mathbf{b}}}{2} \right\|^{2}
     -\tilde{\mathbf{c}}^T \mathbf{h}-\mathbf{x}^{T} \mathbf{W}\mathbf{h} \nonumber\\
-	      \text{Free Energy:}~&\mathcal{F}(\mathbf{x}) = \left\| \mathbf{x} - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\mathbf{x}\cdot \mathbf{W}})\nonumber\\
 	      &\tilde{\mathbf{b}} = \mathbf{b} + \mathbf{A}\cdot \mathbf{x}_{<t}\nonumber\\
 	      &\tilde{\mathbf{c}} = \mathbf{c} + \mathbf{B}\cdot \mathbf{x}_{<t}\nonumber\\
-	      &\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber
+	      &\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber\\
+	      \text{Free Energy:}~&\mathcal{F}(\mathbf{x}) = \left\| \mathbf{x} - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\mathbf{x}\cdot \mathbf{W}})\nonumber
 	    \end{align}
 	    }
 
@@ -292,15 +295,26 @@
 	      \end{align}
 	\end{frame}
 	
+	\begin{frame}[t]{Training of Energy-based Model}
+	 \alert<1-1>{Maximum Likelihood Estimation} $P(\x|\btheta)$\\
+	 \begin{columns}
+	 \column{2in}
+	 Kullback-Leibler Divergence:
+	 
+	 \column{1.5in}
+	 $F(\x)$, true distribution\\
+	 $P(\x|\btheta)$, model distribution\\
+	 \end{columns}
+	\end{frame}
 
 	
 	\begin{frame}[t]{Training of Energy-based Model}
-		 Optimization Method: \alert<1-1>{Maximum Likelihood}\\
+		
 		\uncover<1-2>{
 		\begin{columns}
 		 \column{3in}
 		\begin{align}
-			    P(\x) = \frac{e^{-\mathcal{F}(\x)}}{Z}\nonumber
+			  - \log P(\x|\btheta) = \mathcal{F}(\x) + \log\sum_{\x}\sum_{\h}e^{-E_{\btheta}(\x,\h)}\nonumber
 		\end{align}
 		\column{1.5in}
 		Free Energy
