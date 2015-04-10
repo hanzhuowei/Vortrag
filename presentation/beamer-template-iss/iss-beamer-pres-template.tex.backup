@@ -88,7 +88,7 @@
 		      
 \path node[hoz,right] at ($(I-5)!0.5!(H-6)$) {\color{black}$\mathbf{W}^{(1)}$};      
 \path node[hoz,right] at ($(H-6)!0.5!(O-4)$) {\color{black}$\mathbf{W}^{(2)}$}; 
-\path node[hoz,right] at (\layersep + 0.3 cm,-6 cm) {\color{black}Activation\includegraphics[width=0.1\textwidth]{activation.png}}; 
+\path node[hoz,right] at ($(H-6)!0.5!$) {\color{black}Activation,\includegraphics[width=0.1\textwidth]{activation.png}}; 
 % Connect every node in the input layer with every node in the  hidden layer.
     \foreach \source in {1,2,3,5}
         \foreach \dest in {1,2,3,6}

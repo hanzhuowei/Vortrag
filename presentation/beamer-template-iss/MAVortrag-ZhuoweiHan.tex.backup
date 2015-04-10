@@ -53,6 +53,11 @@
 \graphicspath{ {../Fig/} }
 \usepackage[beamer]{hf-tikz}
 \usepackage{tikz}
+\usetikzlibrary{calc}
+\def\layersep{2.5cm}
+\def\layersept{5cm}
+% \usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
+\def\layersep{2.5cm}
 % \setbeameroption{show notes on second screen=left}
 % \setbeameroption{second mode text on second screen=left}
 % \setbeameroption{show notes}
@@ -76,32 +81,34 @@
 
 % -----------------------------------------------------------------------------
 % Motivation slide
-\begin{frame}[t]{Motivation} % 1 folie
-% \textcolor{blue}{\Large Training objective}
-\only<1-1>{
-\textcolor{blue}{\Large Speech Emotion Recognition}\\
-	\begin{itemize}
-		\itemsep20pt
-		\item Most current work focuses on speech processing based on linguistic information,  e.g.: Skype Translator
-		\item More natural human-machine interaction requires paralinguistic information such as age, gender, emotion.
-		\item Speech Recognition / Speeker Identification / Emotion Recognition
-		\only<1-1>{\begin{figure}[b]
-		 \includegraphics[width=0.6\linewidth]{paraliguistic.png}
-		\end{figure}}
-
-	\end{itemize}
-}
-
-\only<2-2>{
-\textcolor{blue}{\Large Deep Learning}\\
-	\begin{itemize}
-	    \itemsep15pt
-	    \item Deep architecture for extracting complex structure and building internal representations from input
-	    \item New research area of machine learning (from shallow to deep structure)
-	    \item Widely applied in vision/audition processing, e.g. handwriting recognition (Graves, Alex, et al. 2009), traffic sign classification (Schmidhuber, et al. 2011), text translation (Google, 2014)
-	\end{itemize}
-}
-\end{frame}
+% \begin{frame}[t]{Motivation} % 1 folie
+% % \textcolor{blue}{\Large Training objective}
+% \only<1-1>{
+% \textcolor{blue}{\Large Speech Emotion Recognition}\\
+% 	\begin{itemize}
+% 		\itemsep20pt
+% % 		\item Most current work focuses on speech processing based on linguistic information,  e.g.: Skype Translator
+% 		\item More natural human-machine interaction requires paralinguistic information such as age, gender, emotion.
+% 		\item Emotion data are high-dimensional complex data with non-linear temporal hidden features
+% 		\item GMM is insufficient
+% % 		\item Speech Recognition / Speeker Identification / Emotion Recognition
+% 		\only<1-1>{\begin{figure}[b]
+% 		 \includegraphics[width=0.6\linewidth]{paraliguistic.png}
+% 		\end{figure}}
+% 
+% 	\end{itemize}
+% }
+% 
+% \only<2-2>{
+% \textcolor{blue}{\Large Deep Learning}\\
+% 	\begin{itemize}
+% 	    \itemsep15pt
+% 	    \item New research area of machine learning (from shallow to deep structure)
+% 	    \item Deep architecture for extracting complex structure and building internal representations via unsupervised learning
+% 	    \item Widely applied in vision/audition processing, e.g. handwriting recognition (Graves, Alex, et al. 2009), traffic sign classification (Schmidhuber, et al. 2011), text translation (Google, 2014)
+% 	\end{itemize}
+% }
+% \end{frame}
 
 % -----------------------------------------------------------------------------
 % This is the table of contents. You can insert a motivation before or after this slide.
@@ -130,577 +137,672 @@
 }
 
 %% =========
-\section{Foundations} %2 folies
-% -----------------------------------------------------------------------------
-\subsection{Mel Frequency Cepstral Features}
-	\begin{frame}[t]{Mel Frequency Cepstral Features}
-		\begin{minipage}[t]{0.48\linewidth}
-			\begin{itemize}
-				\item short-term power spectrum 
-				\item mel-scale approximate human perception
-				\item widely-used in speech recognition tasks
-				\item Transformation between Mel and Hertz scale
-				\begin{figure}
-
-				\begin{eqnarray}
-				f_{mel} = 1125~\ln~(1+f_{Hz}/700)\nonumber\\
-				f_{Hz} = 700 \left(\exp(f_{mel}/1125)-1\right)\nonumber
-				\end{eqnarray}
-
-			\end{figure}
-			\end{itemize}
-		\end{minipage}
-		\begin{minipage}[t]{0.48\linewidth}
-		\begin{figure}
-		 \includegraphics[width = \linewidth]{MelvsHz.png}
-		\end{figure}
-		\end{minipage}
-	\end{frame}
-
-
-\subsection{Emotion Recognition Approaches}
-
-\begin{frame}[t]{Emotion Recognition Approaches}
-	\begin{minipage}[t]{0.48\linewidth}
-	  \textcolor{blue}{\Large Traditional Approaches}
-	  \begin{itemize}
-	   \item pre-selected features
-	   \item supervised training
-	   \item low-level features not appropriate for claasification
-	   \item shallow structure of classifiers
-	  \end{itemize}
-	\end{minipage}\hfill
-	\begin{minipage}[t]{0.48\linewidth}
-	\textcolor{blue}{\Large Deep Learning Approaches}
-	  \begin{itemize}
-	   \item learning representations from high-dim data
-	   \item extracting appropriate features without hand-crafting
-	   \item low-level features are used to build high-level features as network gets deeper
-	   \item frame-based classification
-	  \end{itemize}
-
-	\end{minipage}
-
-\end{frame}
-
-
-\section{Conditional Restricted Boltzmann Machine} %% 
-
-
-
-    \subsection{Restricted Boltzmann Machine}
-	\begin{frame}[t]{Concepts}
-% 	\txtcolb{}
-	 \begin{itemize}
-	  \itemsep10pt
-	  \item Generative graphical model, capture data distrbution $P(\x|\boldsymbol{\theta})$
-	  \item Trained in unsupervised way, only use unlabeled input sequence$\x$ for learning. 
-		  \begin{itemize}
-		   \item automatically extract useful features from data 
-		   \item Find hidden structure (distribution). 
-		   \item Learned features used for prediction or classification
-		  \end{itemize}
-	  \item Successfully applied in motion capture (Graham W. Taylor, Geoffrey E. Hinton, 2006)
-% 	  \item speicifies a joint distribution over input and hidden variables, can either generating data, or with bayesian
-% rule to form conditional distribution. 
-	  \item Potential to be extend to capture temporal information
-	 \end{itemize}
-
-
-	
-% 	\begin{minipage}[t]{\linewidth}
-% 	 $\x$, input units\\
-% 	 $\h$, hidden units
-% 	\end{minipage}
-
-	\end{frame}
-	
-	\begin{frame}[t]{Restricted Boltzmann Machine}
-	\txtcolb{Structure}
-	    \begin{figure}[t]
-	    \includegraphics[width=0.9\linewidth]{RBMStruct.png}
-	    \end{figure}
-	    \only<2->{
-	    \begin{minipage}{0.48\linewidth}
-	    \begin{align}
-	      \text{Energy Function:}~&E_{\boldsymbol{\theta}} = -\mathbf{x^{T}}\mathbf{W}\mathbf{h}-\mathbf{b^{T}}\mathbf{x}-\mathbf{c^{T}}\mathbf{h}\nonumber\\
-	    \text{Joint Distribution:}~&P^{RBM} (\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-E_{\boldsymbol{\theta}}(\mathbf{x},\mathbf{h})}\nonumber\\
-	     \text{Partition Function:}~ &Z = \sum_{\mathbf{x,h}} e^{-E_{\boldsymbol{\theta}}(\mathbf{x},\mathbf{h})}\nonumber\\
-	     \text{Free Energy:}~& \mathcal{F}(\mathbf{x}) = - \log \sum_h e^{-E(\mathbf{x,h})}\nonumber
-	    \end{align}
-	    \end{minipage}
-	    }
-	\end{frame}
-	
-	\begin{frame}[t]{Inference}
-	\txtcolb{Inference}
-		\begin{minipage}[t]{0.48\linewidth}
-% 		\begin{figure}[t]
-			 \begin{align}
-			 &P(\mathbf{x}) = \sum_{\mathbf{h}} P(\mathbf{x,h})\nonumber\\ 
-			 &P (\mathbf{h}) = \sum_{\mathbf{x}} P(\mathbf{x,h})\nonumber\\
-			 \only<2->{&P (\h|\x)= \dfrac{P(\x,\h)}{P(\x)}\nonumber\\
-			 &P(\x|\h)= \dfrac{P(\x,\h)}{P(\h)}\nonumber\\}
-			 \only<3->{&P(h_{j}=1 \mid \mathbf{x})= sigmoid(\sum_{i} x_{i}W_{ij} + c_{j})\nonumber\\
-			 &P(x_{i}=1 \mid \mathbf{h}) = sigmoid(\sum_{j} W_{ij} h_{j} + b_{i})\nonumber}
-			 \notag
-			 \end{align}
-% 		\end{figure}
-	\end{minipage}
-% 	\begin{minipage}{0.48\linewidth}
-% % 		\begin{figure}[t]
-% 			\begin{eqnarray}
-% 			\end{eqnarray}
-% % 		\end{figure}
-% 	\end{minipage}
-
-	\vspace{5mm}
-	 
-	\end{frame}
- \subsection{CRBM}
-	\begin{frame}[t]{Conditional RBM}
-	    \only<1-2>{
-	    \begin{itemize}
-	     \item Consider visible units from previous time step as additional bias for current visible and hidden layer
-	     \item $A$ and $B$ are weight parameter of visible (history) - visible and visible (history) - hidden connections
-	     \item Visible layer is linear units with independent Gaussian noise to model real-valued data, e.g. spectral features
-	    \end{itemize}
-	    }
-	    \only<2->{
-	    \begin{figure}[t]
-	    \includegraphics<2>[width=0.7\linewidth]{CRBM.png}
-	    \includegraphics<3>[scale = 0.2]{CRBM.png}
-	    \end{figure}
-	    }
-	    \only<3->{\begin{align}
-	      \text{Energy Function:}~&E^{CRBM}_{\boldsymbol{\theta}} (\mathbf{x}, \mathbf{h})  = \left\| \frac{\mathbf{x} - \tilde{\mathbf{b}}}{2} \right\|^{2}
-    -\tilde{\mathbf{c}}^T \mathbf{h}-\mathbf{x}^{T} \mathbf{W}\mathbf{h} \nonumber\\
-	      &\tilde{\mathbf{b}} = \mathbf{b} + \mathbf{A}\cdot \mathbf{x}_{<t}\nonumber\\
-	      &\tilde{\mathbf{c}} = \mathbf{c} + \mathbf{B}\cdot \mathbf{x}_{<t}\nonumber\\
-	      &\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber\\
-	      \text{Free Energy:}~&\mathcal{F}(\mathbf{x}) = \left\| \mathbf{x} - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\mathbf{x}\cdot \mathbf{W}})\nonumber
-	    \end{align}
-	    }
-
-
-	\end{frame}
-	
-% 	\begin{frame}[t]{Conditional RBM}
-% 	      \begin{align}
-% 		\text{Energy Function:}~&E^{CRBM}_{\boldsymbol{\theta}} (\mathbf{x}, \mathbf{h})  = \left\| \frac{\mathbf{x} - \tilde{\mathbf{b}}}{2} \right\|^{2}
-%       -\tilde{\mathbf{c}}^T \mathbf{h}-\mathbf{x}^{T} \mathbf{W}\mathbf{h} \nonumber\\
-% 		\text{Free Energy:}~&\mathcal{F}(\mathbf{x}) = \left\| \mathbf{x} - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\mathbf{x}\cdot \mathbf{W}})\nonumber\\
-% 		&\tilde{\mathbf{b}} = \mathbf{b} + \mathbf{A}\cdot \mathbf{x}_{<t}\nonumber\\
-% 		&\tilde{\mathbf{c}} = \mathbf{c} + \mathbf{B}\cdot \mathbf{x}_{<t}\nonumber\\
-% 		&\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber
-% 	      \end{align}
-% 	\end{frame}
-	
-	\begin{frame}[t]{Training of Energy-based Model}
-	      \begin{columns}[c]
-		    \column{3in}
-		    \alert<1-1>{Maximum Likelihood Estimation} $P(\x|\btheta)$\vspace{5mm}
-		    \only<2->{
-		    \textcolor{blue}{Kullback-Leibler Divergence}:\\
-		    \begin{align}
-			Q(\x)\|P(\x|\btheta) &=  \int_{-\infty}^{\infty} Q(\x)\cdot \log \dfrac{Q(\x)}{P(\x|\btheta)}\mathrm{d}\x \nonumber\\
-						& = \int_{-\infty}^{\infty}Q(\x)\cdot\log Q(\x) \mathrm{d} \x - \int_{-\infty}^{\infty}Q(\x)\cdot\log P(\x|\btheta) \mathrm{d} \x \nonumber\\
-						& = \left \langle \log Q(\x)\right\rangle_{Q(\x)} - \left\langle \log P(\x|\btheta)\right\rangle_{Q(\x)}\nonumber
-		    \end{align}
-		    $Q(\x)$, true data distribution\\
-		    $P(\x|\btheta)$, model distribution\\
-		    $\left\langle\cdot\right\rangle_{Q(\x)}$, expectation w.r.t. $Q(\x)$}\\
-		    Note that KL is non-negative
-	      \end{columns}
-	 \end{frame}
-
-	
-	\begin{frame}[t]{Training of Energy-based Model}
-		
-		\uncover<1-3>{
-		\begin{columns}
-		 \column{5in}
-		      \begin{align}
-				- \log P(\x|\btheta) = \mathcal{F}(\x) + \log\sum_{\x}\sum_{\h}e^{-E_{\btheta}(\x,\h)}\nonumber
-		      \end{align}
-% 		\column{1.5in}
-% 		Free Energy
-		\end{columns}
-		}
-		\only<2->{
-		      \begin{columns}
-			    \column{4in}
-			    \begin{align}
-				    -\frac{\partial  \log P(\mathbf{x}|\btheta)}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} -
-				    \sum_{\tilde{\mathbf{x}}} P(\tilde{\mathbf{x}})
-					\frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber
-			    \end{align}
-			    $\x$, input (visible) data space\\
-			    $\tilde{\x}$, all possible vectors in the data space, generated by model.\vspace{5mm}
-			    
-			    objective function by averaging log-likelihood over data:
-			    \begin{align}\label{loggra}
-				    - \left\langle\frac{\partial  \log P(\mathbf{x}|\btheta)}{\partial \boldsymbol{\theta}}\right\rangle_{\x} = \left\langle \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}}\right\rangle_{\x} -\alert<3->{
-					  \left\langle \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\right\rangle_{\tilde{\x}}\nonumber}
-			    \end{align}
-% 		      \column{1.5in}
-%       % 		\[ \xleftarrow{\hspace*{3mm}} \]
-% 		      \textcolor{red}{$\leftarrow$intractable!}
-		      \end{columns}
-		}
-% 		\only<3->{
-% 		      \begin{columns}
-% 		      \column{3in}
-% 			\begin{align}
-% 			      - \frac{\partial  \log P(\mathbf{x}|\btheta)}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}} - \alert<3-3>{ \frac{1}{|\mathcal{N}|}
-% 			    \sum_{\tilde{\mathbf{x}}\in \mathcal{N}} P(\tilde{\mathbf{x}})
-% 				\frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\nonumber}
-% 			\end{align}
-% 		      \column{1.5in}
-% 		      sampling
-% 			\end{columns}
-% 		  }
-	\end{frame}
-	
-	\begin{frame}[t]{Training of Energy-based Model}
-% % 		Sampling Method: \textcolor{red}{Gibbs Sampling}
-		\txtcolb{Gibbs sampling}
-		\begin{columns}[c]
-			  \column{1.5in}
-			\uncover<1-1>{\begin{align}
-			      & \x^{(1)} \sim P(\mathbf{x})\nonumber \\
-			      & \mathbf{h}^{(1)} \sim P(\mathbf{h}|\mathbf{x}^{(1)})\nonumber	
-			\end{align}
-			}
-			\uncover<2-2>{
-			\begin{align}
-				  & \x^{(2)} \sim P(\mathbf{x}|\mathbf{h}^{(1)})\nonumber\\
-				  & \mathbf{h}^{(2)} \sim P(\mathbf{h}|\mathbf{x}^{(2)})\nonumber
-			\end{align}
-			}
-			\uncover<3-3>{
-			\begin{align}
-				& \vdots \nonumber\\
-				& \x^{(k)} \sim P(\mathbf{x}|\mathbf{h}^{(k-1)})\nonumber	
-			\end{align}
-			}
-
-			  \column{3in}
-			  \framebox{\includegraphics<1>[width=\textwidth]{markov_chain.png}
-				    \includegraphics<2>[width=\textwidth]{markov_chain2.png}
-				    \includegraphics<3>[width=\textwidth]{markov_chaint.png}
-				    }
-		\end{columns}
-% 		\only<2->{
-% 		\begin{columns}[c]
-% 			  \column{1.5in}
-% 
-% 			  \column{1.5in}
-% 			  \framebox{\includegraphics[width=\textwidth]{markov_chain2.png}}
-% 		\end{columns}
-% 		}
-% 		\only<3->{
-% 		\begin{columns}[c]
-% 			  \column{1.5in}
-% 
-% 			  \column{1.5in}
-% 			  \framebox{\includegraphics[width=\textwidth]{markov_chaint.png}}
-% 		\end{columns}
-% 		}
-% 		
-% 	\only<4->{$t=1$, Gibbs step $\rightarrow$ \textcolor{red}{Contrastive Divergence}}
-	\end{frame}
-	
-	\begin{frame}[t]{Contrastive Divergence}
-% 	 \textcolor{blue}{Contrastive Divergence}\\
-	 \begin{itemize}
-	    \item k=0, $P_0(\x)$ is true data distribution, independent of parameter $\btheta$
-	    \item Performing k-Gibbs steps to generate $P_k(\x|\btheta)$, with $k\rightarrow \infty$ the Markov chain converges to stationary distribution:
-		  \begin{align}
-		      P_{\infty}(\x|\btheta) \rightarrow P(\tilde{\x}|\btheta)\nonumber
-		  \end{align}\\
-	    Rewrite objective function:
-		  \begin{align}
-		   - \left\langle\frac{\partial  \log P(\mathbf{x}|\btheta)}{\partial \boldsymbol{\theta}}\right\rangle_{P_0(\x)} = \left\langle \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}}\right\rangle_{P_0(\x)} -\alert<3->{
-					  \left\langle \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\right\rangle_{P_{\infty}(\x|\btheta)}\nonumber}
-		  \end{align}
-
-% 	    \item Difference between approximation and true model distribution:
-% 		\begin{align}
-% 		    KL(P_{k}(\x|\btheta)\|P(\x|\btheta))\nonumber
-% 		\end{align}
-% 	    \item CD-1 performs well in practice
-	 \end{itemize}
-	  
-	 
-	\end{frame}
-	
-	\begin{frame}[t]{Constrasive Divergence}
-	\txtcolb{Contrastive Divergence}:
-	 Perform CD-1
-	    \begin{align}
-	    &-\dfrac{\partial}{\partial \btheta} (P_0\|P_{\infty}^{\btheta} - P_{1}^{\btheta}\|P_{\infty}^{\btheta})\nonumber\\\vspace{3mm}
-	    &=\left\langle \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}}\right\rangle_{P_0} 
-		  -\left\langle \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\right\rangle_{P_{1}^{\btheta}}\nonumber
-		  \uncover<1-3>{+ \alert<2-2>{\frac{\partial P_{1}^{\btheta}}{\partial \btheta} \frac{\partial (P_{1}^{\btheta}|P_{\infty}^{\btheta})}{\partial P_{1}^{\btheta}}\nonumber}}
-% 		  \only<3->{ \cancel{+\alert<3-3>{\frac{\partial P_{1}^{\btheta}}{\partial \btheta} \frac{\partial (P_{1}^{\btheta}|P_{\infty}^{\btheta})}{\partial P_{1}^{\btheta}}\nonumber}}}
-	    \end{align}
-	    
-	 \only<4->
-	 {\txtcolb{Parameter Update}
-	 \begin{align}
-	  \Delta \btheta \sim \left\langle \frac{\partial \mathcal{F}(\mathbf{x})}{\partial \boldsymbol{\theta}}\right\rangle_{P_0} 
-		  -\left\langle \frac{\partial \mathcal{F}(\tilde{\mathbf{x}})}{\partial \boldsymbol{\theta}}\right\rangle_{P_{1}^{\btheta}}\nonumber
-	 \end{align}
-	}
-	\end{frame}
-
-
-
-
-
-  
-%% =========
-% \section{Multilayer Neural Network}%4 folies
-% 	\subsection{Function and Training}		
-% 	\begin{frame}[t]{Structure and Function}
-% 	\txtcolb{N-hidden layers neural network }
-% 	  \begin{minipage}{0.45\linewidth}
-% 	      \begin{itemize}
-% 	       \itemsep10pt
-% 	       \item Hidden layer pre-activation:\\
-% 	       $\mathbf{a}(\x) =\mathbf{W}^{(1)}\x + \mathbf{b}^{(1)}$\\
-% 	       $a_{j}(\x) = \sum_i w_{ji}^{(1)}x_{i} + b_{j}^{(1)}$
-% 	       \item Hidden layer activation:\\
-% 	       $\h = f(\mathbf{a})$
-% 	       \item Output layer activation:\\
-% 	       $\hat{y}(\x) = o(\mathbf{W}^{(N+1)}\h^{(N)} + \mathbf{b}^{(N+1)} )$
-% 	      \end{itemize}
-% 	  \end{minipage}
-% 	  
-% % 	  \begin{minipage}{0.45\linewidth}
-% % 		\begin{figure}
-% % 		      \includegraphics{}
-% % 		\end{figure}
-% % 	  \end{minipage}
-% 
-% 	\end{frame}
-% 	
-% 	\begin{frame}[t]{Training}
-% 		\textcolor{blue}{\Large Empirical Risk Minimization}
-% 		\begin{itemize}
-% 		 \item learning algorithms\\
-% 		 \begin{eqnarray}
-% 			\text{arg}~\underset{\btheta}{\mathrm{min}} \frac{1}{M}\sum_m l(\hat{y}(\x^{(m)};\btheta),y^{(m)}) + \lambda \Omega(\btheta)\nonumber
-% 			\end{eqnarray}
-% 		 \item loss function $l(\hat{y}(\x^{(m)};\btheta),y^{(m)})$ \\
-% 			for sigmoid activation $l(\btheta)= \sum_m \frac{1}{2} \left\| y^{(m)}-\hat{y}^{(m)}\right\| ^2$\\
-% 		 \item regularizer $\lambda \Omega(\btheta)$
-% 		\end{itemize}
-% 		
-% 		\txtcolb{Optimization}
-% 		\begin{itemize}
-% 		 \item Gradient calculation with Backpropagation
-% 		 \item Stochastic/Mini-batch gradient descent
-% 		\end{itemize}
-% 
-% 		
-% 		
-% 	\end{frame}
-% 	
-% 	
-% 	\subsection{Problems and Solutions}
-% 		
-% 	\begin{frame}[t]{Pre-training}
-% 		\begin{minipage}[h]{\linewidth}
-% 		\txtcolb{Vanishing Gradient}
+% \section{Foundations} %2 folies
+% % -----------------------------------------------------------------------------
+% % \subsection{Mel Frequency Cepstral Features}
+% 	\begin{frame}[t]{Mel Frequency Cepstral Features}
+% 		\begin{minipage}[t]{0.48\linewidth}
 % 			\begin{itemize}
-% 				\item Training time increases as network gets deeper
-% 				\item Gradient shrink exponentially and training end up local minima
-% 				\item Caused by random initialization of network parameters
+% 				\item short-term power spectrum 
+% 				\item mel-scale approximate human perception
+% 				\item widely-used in speech recognition tasks
+% 				\item Transformation between Mel and Hertz scale
+% 				\begin{figure}
+% 
+% 				\begin{eqnarray}
+% 				f_{mel} = 1125~\ln~(1+f_{Hz}/700)\nonumber\\
+% 				f_{Hz} = 700 \left(\exp(f_{mel}/1125)-1\right)\nonumber
+% 				\end{eqnarray}
+% 
+% 			\end{figure}
 % 			\end{itemize}
-% 		\end{minipage}\vspace{5mm}
-% 		\begin{minipage}[h]{\linewidth}
-% 		\only<1-1>{
+% 		\end{minipage}
+% 		\begin{minipage}[t]{0.48\linewidth}
 % 		\begin{figure}
-% 		 \includegraphics[width=0.6\textwidth]{GradVanishing.png}
+% 		 \includegraphics[width = \linewidth]{MelvsHz.png}
 % 		\end{figure}
+% 		\end{minipage}
+% 	\end{frame}
+% 	
+% 	\begin{frame}[t]{Framework}
+% 	      \begin{itemize}
+% 	       \item Pre-processing of emotion data to extract MFCC features
+% 	       \item Model data distribution based on MFCCs via unsupervised learning
+% 	       \item Classification with supervised learning
+% 	      \end{itemize}
 % 
-% 		}
-% 		\visible<2->{
-% 		\txtcolb{Unsupervised layerwise pre-training}
-% 		\begin{itemize}
-% 		 \itemsep8pt
-% 		 \item Pretrain the deep network layer by layer to build a stacked auto-encoder
-% 		 \item Each layer is trained as a single hidden layer auto-encoder by minimizing average reconstruction error:\\
-% 		      $\mathrm{min}~l_{AE} = \sum_m \frac{1}{2}\left\|\x^{(m)}-\hat{\x}^{(m)}\right\|^2$
-% 		 \item Fine-tuning the entire deep network with supervised training
-% 		\end{itemize}
-% 		}
-% 		\end{minipage}		
 % 	\end{frame}
 % 
-% % 		\begin{itemize}
-% % 			\item Optimization problem non-convex\\
-% % 			$\Rightarrow$ getting stuck in poor local minima
-% % 			\item Diffusion of gradients
-% % 			\item Large p small n problem $\Rightarrow$ overfitting
+% 
+% % 
+% % \subsection{Emotion Recognition Approaches}
+% % 
+% % \begin{frame}[t]{Emotion Recognition Approaches}
+% % 	\begin{minipage}[t]{0.48\linewidth}
+% % 	  \textcolor{blue}{\Large Traditional Approaches}
+% % 	  \begin{itemize}
+% % 	   \item pre-selected features
+% % 	   \item supervised training
+% % 	   \item low-level features not appropriate for claasification
+% % 	   \item shallow structure of classifiers
+% % 	  \end{itemize}
+% % 	\end{minipage}\hfill
+% % 	\begin{minipage}[t]{0.48\linewidth}
+% % 	\textcolor{blue}{\Large Deep Learning Approaches}
+% % 	  \begin{itemize}
+% % 	   \item learning representations from high-dim data
+% % 	   \item extracting appropriate features without hand-crafting
+% % 	   \item low-level features are used to build high-level features as network gets deeper
+% % 	   \item frame-based classification
+% % 	  \end{itemize}
+% % 
+% % 	\end{minipage}
+% % \end{frame}
+% 
+% 
+% % \section{Conditional Restricted Boltzmann Machine} %% 
+% % 
+% % 
+% % 
+% %     \subsection{Restricted Boltzmann Machine}
+% % 	\begin{frame}[t]{Concepts}
+% % % 	\txtcolb{}
+% % 	 \begin{itemize}
+% % 	  \itemsep10pt
+% % 	  \item Generative graphical model, capture data distrbution $P(\x|\boldsymbol{\theta})$
+% % 	  \item Trained in unsupervised way, only use unlabeled input sequence $\x$ for learning. 
+% % 		  \begin{itemize}
+% % 		   \item automatically extract useful features from data 
+% % 		   \item find hidden structure (distribution). 
+% % 		   \item learned features used for prediction or classification
+% % 		  \end{itemize}
+% % 	  \item Successfully applied in motion capture (Graham W. Taylor, Geoffrey E. Hinton, 2006)
+% % % 	  \item speicifies a joint distribution over input and hidden variables, can either generating data, or with bayesian
+% % % rule to form conditional distribution. 
+% % 	  \item Potential to be extend to capture temporal information
+% % 	 \end{itemize}
+% % 
+% % 
 % % 	
-% % 	\end{itemize}
-% %%%%%%%%%%%%%%%%%%%%%%%%%Noob pictures for pretraining%%%%%%%%%%%%%%%
-% 	\begin{frame}[t]{Pre-training}
+% % % 	\begin{minipage}[t]{\linewidth}
+% % % 	 $\x$, input units\\
+% % % 	 $\h$, hidden units
+% % % 	\end{minipage}
+% % 
+% % 	\end{frame}
+% % 	
+% % 	\begin{frame}[t]{Restricted Boltzmann Machine}
+% % 	\txtcolb{Structure}
+% % 	    \begin{figure}[t]
+% % 		\includegraphics[width=0.9\linewidth]{RBMStruct.png}
+% % 	    \end{figure}
+% % 	    \only<1-1>
+% % 	    {\begin{align}
+% % 	      \x \in \{0,1\}\nonumber\\
+% % 	      \h \in \{0,1\}\nonumber
+% % 	     \end{align}
+% % 
+% % 	    }
+% % 	    \only<2->{
+% % 	      \begin{minipage}{0.48\linewidth}
+% % 	      \begin{align}
+% % 		\text{Energy Function:}~&E_{\boldsymbol{\theta}} = -\mathbf{x^{T}}\mathbf{W}\mathbf{h}-\mathbf{b^{T}}\x-\mathbf{c^{T}}\mathbf{h}\nonumber\\
+% % 	      \text{Joint Distribution:}~&P^{RBM} (\x,\mathbf{h}) = \frac{1}{Z} e^{-E_{\boldsymbol{\theta}}(\x,\mathbf{h})}\nonumber\\
+% % 	      \text{Partition Function:}~ &Z = \sum_{\mathbf{x,h}} e^{-E_{\boldsymbol{\theta}}(\x,\mathbf{h})}\nonumber\\
+% % 	      \text{Free Energy:}~& \mathcal{F}(\x) = - \log \sum_h e^{-E(\mathbf{x,h})}\nonumber
+% % 	      \end{align}
+% % 	      \end{minipage}
+% % 	    }
+% % 	\end{frame}
+% % 	
+% % 	\begin{frame}[t]{Inference}
+% % 	\txtcolb{Inference}
+% % 		\begin{minipage}[t]{0.48\linewidth}
+% % % 		\begin{figure}[t]
+% % 			 \begin{align}
+% % 			 &P(\x) = \sum_{\mathbf{h}} P(\mathbf{x,h})\nonumber\\ 
+% % 			 &P (\mathbf{h}) = \sum_{\x} P(\mathbf{x,h})\nonumber\\
+% % 			 \only<2->{&P (\h|\x)= \dfrac{P(\x,\h)}{P(\x)}\nonumber\\
+% % 			 &P(\x|\h)= \dfrac{P(\x,\h)}{P(\h)}\nonumber\\}
+% % 			 \only<3->{&P(h_{j}=1 \mid \x)= sigmoid(\sum_{i} x_{i}W_{ij} + c_{j})\nonumber\\
+% % 			 &P(x_{i}=1 \mid \mathbf{h}) = sigmoid(\sum_{j} W_{ij} h_{j} + b_{i})\nonumber}
+% % 			 \notag
+% % 			 \end{align}
+% % % 		\end{figure}
+% % 	\end{minipage}
+% % % 	\begin{minipage}{0.48\linewidth}
+% % % % 		\begin{figure}[t]
+% % % 			\begin{eqnarray}
+% % % 			\end{eqnarray}
+% % % % 		\end{figure}
+% % % 	\end{minipage}
+% % 
+% % 	\vspace{5mm}
+% % 	 
+% % 	\end{frame}
+% %  \subsection{CRBM}
+% % 	\begin{frame}[t]{Conditional RBM}
+% % 	    \only<1-2>{
+% % 	    \begin{itemize}
+% % 	     \item Consider visible units from previous time step as additional bias for current visible and hidden layer
+% % 	     \item $A$ and $B$ are weight parameter of visible (history) - visible and visible (history) - hidden connections
+% % 	     \item Visible layer is linear units with independent Gaussian noise to model real-valued data, e.g. spectral features
+% % 	    \end{itemize}
+% % 	    }
+% % 	    \only<2->{
+% % 	    \begin{figure}[t]
+% % 	    \includegraphics<2>[width=0.7\linewidth]{CRBM.png}
+% % 	    \includegraphics<3>[scale = 0.2]{CRBM.png}
+% % 	    \end{figure}
+% % 	    }
+% % 	    \only<3->{\begin{align}
+% % 	      \text{Energy Function:}~&E^{CRBM}_{\boldsymbol{\theta}} (\x, \mathbf{h})  = \left\| \frac{\x - \tilde{\mathbf{b}}}{2} \right\|^{2}
+% %     -\tilde{\mathbf{c}}^T \mathbf{h}-\x^{T} \mathbf{W}\mathbf{h} \nonumber\\
+% % 	      &\tilde{\mathbf{b}} = \mathbf{b} + \mathbf{A}\cdot \x_{<t}\nonumber\\
+% % 	      &\tilde{\mathbf{c}} = \mathbf{c} + \mathbf{B}\cdot \x_{<t}\nonumber\\
+% % 	      &\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber\\
+% % 	      \text{Free Energy:}~&\mathcal{F}(\x) = \left\| \x - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\x\cdot \mathbf{W}})\nonumber
+% % 	    \end{align}
+% % 	    }
+% % 
+% % 
+% % 	\end{frame}
+% % 	
+% % % 	\begin{frame}[t]{Conditional RBM}
+% % % 	      \begin{align}
+% % % 		\text{Energy Function:}~&E^{CRBM}_{\boldsymbol{\theta}} (\x, \mathbf{h})  = \left\| \frac{\x - \tilde{\mathbf{b}}}{2} \right\|^{2}
+% % %       -\tilde{\mathbf{c}}^T \mathbf{h}-\x^{T} \mathbf{W}\mathbf{h} \nonumber\\
+% % % 		\text{Free Energy:}~&\mathcal{F}(\x) = \left\| \x - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\x\cdot \mathbf{W}})\nonumber\\
+% % % 		&\tilde{\mathbf{b}} = \mathbf{b} + \mathbf{A}\cdot \x_{<t}\nonumber\\
+% % % 		&\tilde{\mathbf{c}} = \mathbf{c} + \mathbf{B}\cdot \x_{<t}\nonumber\\
+% % % 		&\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber
+% % % 	      \end{align}
+% % % 	\end{frame}
+% % 	
+% % 	\begin{frame}[t]{Training of Energy-based Model}
+% % % 	      \begin{columns}[c]
+% % % 		    \column{3in}
+% % 		    \alert<1-1>{Maximum Likelihood Estimation} $P(\x|\btheta)$\\\vspace{5mm}
+% % 		    \only<2->{
+% % 		    \textcolor{blue}{Kullback-Leibler Divergence}:
+% % 		    \begin{align}
+% % 			Q(\x)\|P(\x|\btheta) &=  \int_{-\infty}^{\infty} Q(\x)\cdot \log \dfrac{Q(\x)}{P(\x|\btheta)}\mathrm{d}\x \nonumber\\
+% % 						& = \int_{-\infty}^{\infty}Q(\x)\cdot\log Q(\x) \mathrm{d} \x - \int_{-\infty}^{\infty}Q(\x)\cdot\log P(\x|\btheta) \mathrm{d} \x \nonumber\\
+% % 						& = \left \langle \log Q(\x)\right\rangle_{Q(\x)} - \left\langle \alert<3->{\log P(\x|\btheta)}\right\rangle_{Q(\x)}\nonumber
+% % 		    \end{align}
+% % 		    $Q(\x)$, true data distribution\\\vspace{2mm}
+% % 		    $P(\x|\btheta)$, model distribution\\\vspace{2mm}
+% % 		    $\left\langle\cdot\right\rangle_{Q(\x)}$, expectation w.r.t. $Q(\x)$\\\vspace{2mm}
+% % 		    Note that KL is non-negative}
+% % % 	      \end{columns}
+% % 	 \end{frame}
+% % 
+% % 	
+% % 	\begin{frame}[t]{Training of Energy-based Model}
+% % 		
+% % 		\uncover<1-3>{
+% % 		\begin{columns}
+% % 		 \column{5in}
+% % 		      \begin{align}
+% % 				- \log P(\x|\btheta) = \mathcal{F}(\x) + \log\sum_{\x}\sum_{\h}e^{-E_{\btheta}(\x,\h)}\nonumber
+% % 		      \end{align}
+% % % 		\column{1.5in}
+% % % 		Free Energy
+% % 		\end{columns}
+% % 		}
+% % 		
+% % 		      \begin{columns}
+% % 			    \column{4in}
+% % 		\only<2->{  \begin{align}
+% % 				    -\frac{\partial  \log P(\x|\btheta)}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\x)}{\partial \boldsymbol{\theta}} -
+% % 				    \sum_{\tilde{\x}} P(\tilde{\x})
+% % 					\frac{\partial \mathcal{F}(\tilde{\x})}{\partial \boldsymbol{\theta}}\nonumber
+% % 			    \end{align}
+% % 			    $\x$, input (visible) data space\\
+% % 			    $\tilde{\x}$, all possible vectors in the data space, generated by model.\vspace{5mm}
+% % 			}
+% % 		\only<3->
+% % 		{objective function by averaging log-likelihood over data:
+% % 			    \begin{align}\label{loggra}
+% % 				    - \left\langle\frac{\partial  \log P(\x|\btheta)}{\partial \boldsymbol{\theta}}\right\rangle_{\x} = \left\langle \frac{\partial \mathcal{F}(\x)}{\partial \boldsymbol{\theta}}\right\rangle_{\x} -\alert<3->{
+% % 					  \left\langle \frac{\partial \mathcal{F}(\tilde{\x})}{\partial \boldsymbol{\theta}}\right\rangle_{\tilde{\x}}\nonumber}
+% % 			    \end{align}
+% % 		}
+% % % 		      \column{1.5in}
+% % %       % 		\[ \xleftarrow{\hspace*{3mm}} \]
+% % % 		      \textcolor{red}{$\leftarrow$intractable!}
+% % 		      \end{columns}
+% % 
+% % % 		\only<3->{
+% % % 		      \begin{columns}
+% % % 		      \column{3in}
+% % % 			\begin{align}
+% % % 			      - \frac{\partial  \log P(\x|\btheta)}{\partial \boldsymbol{\theta}} = \frac{\partial \mathcal{F}(\x)}{\partial \boldsymbol{\theta}} - \alert<3-3>{ \frac{1}{|\mathcal{N}|}
+% % % 			    \sum_{\tilde{\x}\in \mathcal{N}} P(\tilde{\x})
+% % % 				\frac{\partial \mathcal{F}(\tilde{\x})}{\partial \boldsymbol{\theta}}\nonumber}
+% % % 			\end{align}
+% % % 		      \column{1.5in}
+% % % 		      sampling
+% % % 			\end{columns}
+% % % 		  }
+% % 	\end{frame}
+% % 	
+% % 	\begin{frame}[t]{Training of Energy-based Model}
+% % % % 		Sampling Method: \textcolor{red}{Gibbs Sampling}
+% % 		\txtcolb{Gibbs sampling}
+% % 		\begin{columns}[c]
+% % 			  \column{1.5in}
+% % 			\uncover<1-1>{\begin{align}
+% % 			      & \x^{(1)} \sim P(\x)\nonumber \\
+% % 			      & \mathbf{h}^{(1)} \sim P(\mathbf{h}|\x^{(1)})\nonumber	
+% % 			\end{align}
+% % 			}
+% % 			\uncover<2-2>{
+% % 			\begin{align}
+% % 				  & \x^{(2)} \sim P(\x|\mathbf{h}^{(1)})\nonumber\\
+% % 				  & \mathbf{h}^{(2)} \sim P(\mathbf{h}|\x^{(2)})\nonumber
+% % 			\end{align}
+% % 			}
+% % 			\uncover<3-3>{
+% % 			\begin{align}
+% % 				& \vdots \nonumber\\
+% % 				& \x^{(k)} \sim P(\x|\mathbf{h}^{(k-1)})\nonumber	
+% % 			\end{align}
+% % 			}
+% % 
+% % 			  \column{3in}
+% % 			  \framebox{\includegraphics<1>[width=\textwidth]{markov_chain.png}
+% % 				    \includegraphics<2>[width=\textwidth]{markov_chain2.png}
+% % 				    \includegraphics<3>[width=\textwidth]{markov_chaint.png}
+% % 				    }
+% % 		\end{columns}
+% % % 		\only<2->{
+% % % 		\begin{columns}[c]
+% % % 			  \column{1.5in}
+% % % 
+% % % 			  \column{1.5in}
+% % % 			  \framebox{\includegraphics[width=\textwidth]{markov_chain2.png}}
+% % % 		\end{columns}
+% % % 		}
+% % % 		\only<3->{
+% % % 		\begin{columns}[c]
+% % % 			  \column{1.5in}
+% % % 
+% % % 			  \column{1.5in}
+% % % 			  \framebox{\includegraphics[width=\textwidth]{markov_chaint.png}}
+% % % 		\end{columns}
+% % % 		}
+% % % 		
+% % % 	\only<4->{$t=1$, Gibbs step $\rightarrow$ \textcolor{red}{Contrastive Divergence}}
+% % 	\end{frame}
+% % 	
+% % 	\begin{frame}[t]{Contrastive Divergence}
+% % % 	 \textcolor{blue}{Contrastive Divergence}\\
+% % 	 \begin{itemize}
+% % 	    \itemsep10pt
+% % 	    \item k=0, $P_0(\x)$ is true data distribution, independent of parameter $\btheta$
+% % 	    \item Performing k-Gibbs steps to generate $P_k(\x|\btheta)$, with $k\rightarrow \infty$ the Markov chain converges to stationary distribution:
+% % 		  \begin{align}
+% % 		      P_{\infty}(\x|\btheta) \rightarrow P(\tilde{\x}|\btheta)\nonumber
+% % 		  \end{align}\\
+% % 	    \only<2->
+% % 	    {Rewrite objective function:
+% % 		  \begin{align}
+% % 		   - \left\langle\frac{\partial  \log P(\x|\btheta)}{\partial \boldsymbol{\theta}}\right\rangle_{P_0(\x)} = \left\langle \frac{\partial \mathcal{F}(\x)}{\partial \boldsymbol{\theta}}\right\rangle_{P_0(\x)} -\alert<3->{
+% % 					  \left\langle \frac{\partial \mathcal{F}(\x)}{\partial \boldsymbol{\theta}}\right\rangle_{P_{\infty}(\x|\btheta)}\nonumber}
+% % 		  \end{align}
+% % 	    }
+% % % 	    \item Difference between approximation and true model distribution:
+% % % 		\begin{align}
+% % % 		    KL(P_{k}(\x|\btheta)\|P(\x|\btheta))\nonumber
+% % % 		\end{align}
+% % % 	    \item CD-1 performs well in practice
+% % 	 \end{itemize}
+% % 	  
+% % 	 
+% % 	\end{frame}
+% % 	
+% % 	\begin{frame}[t]{Constrasive Divergence}
+% % 	\txtcolb{Contrastive Divergence}:
+% % 	 Perform CD-1
+% % 	    \begin{align}
+% % 	    &-\dfrac{\partial}{\partial \btheta} (P_0\|P_{\infty}^{\btheta} - P_{1}^{\btheta}\|P_{\infty}^{\btheta})\nonumber\\\vspace{3mm}
+% % 	    &=\left\langle \frac{\partial \mathcal{F}(\x)}{\partial \boldsymbol{\theta}}\right\rangle_{P_0} 
+% % 		  -\left\langle \frac{\partial \mathcal{F}(\x)}{\partial \boldsymbol{\theta}}\right\rangle_{P_{1}^{\btheta}}\nonumber
+% % 		  \uncover<1-2>{+ \alert<2-2>{\frac{\partial P_{1}^{\btheta}}{\partial \btheta} \frac{\partial (P_{1}^{\btheta}|P_{\infty}^{\btheta})}{\partial P_{1}^{\btheta}}\nonumber}}
+% % % 		  \only<3->{ \cancel{+\alert<3-3>{\frac{\partial P_{1}^{\btheta}}{\partial \btheta} \frac{\partial (P_{1}^{\btheta}|P_{\infty}^{\btheta})}{\partial P_{1}^{\btheta}}\nonumber}}}
+% % 	    \end{align}
+% % 	    
+% % 	 \only<4->
+% % 	 {\txtcolb{Parameter Update}
+% % 	 \begin{align}
+% % 	  \Delta \btheta \sim \left\langle \frac{\partial \mathcal{F}(\x)}{\partial \boldsymbol{\theta}}\right\rangle_{P_0} 
+% % 		  -\left\langle \frac{\partial \mathcal{F}(\x)}{\partial \boldsymbol{\theta}}\right\rangle_{P_{1}^{\btheta}}\nonumber
+% % 	 \end{align}
+% % 	}
+% % 	\end{frame}
+% % 
+% % 
+% % 
+% % 
+% % 
+% %   
+% % %% =========
+\section{Multilayer Neural Network}%4 folies
+	\subsection{Function and Training}		
+	\begin{frame}[t]{Structure and Function}
+% 	\txtcolb{N-hidden layers neural network }
+	  \begin{columns}[T]
+	      \column{2in}
+	      Hidden layer pre-activation:
+	       \begin{align}
+	       \mathbf{a}(\x) =\mathbf{W}^{(1)}\x + \mathbf{b}^{(1)}\nonumber\\
+	       a_{j}(\x) = \sum_i w_{ji}^{(1)}x_{i} + b_{j}^{(1)}\nonumber
+	       \end{align}
+	       Hidden layer activation:
+	       \begin{align}
+		  \h = f(\mathbf{a})\nonumber
+		\end{align}
+	  \column{2.5in}
+	  		    \tikzset{neuron/.style={circle,thick,fill=black!25,minimum size=17pt,inner sep=0pt},
+			input neuron/.style={neuron, draw,thick, fill=gray!30},
+			hidden neuron/.style={neuron,fill=white,draw},
+			output neuron/.style={neuron,draw,thick,fill=black!20},
+			hoz/.style={rotate=-90}}   %<--- for labels
+
+		   \scalebox{0.7}
+		   {
+		   \begin{tikzpicture}[t,-,draw=black, node distance=\layersep,transform shape,rotate=90,width=0.2\textwidth,height=0.2\textwidth]  %<-- rotate the NN
+
+		    % Draw the input layer nodes
+		    \foreach \name / \y in {1/1,3/n}
+		    \node[input neuron, hoz] (I-\name) at (0,-\name) {\color{black}$x_\y$};
+
+		    \node[hoz] () at (0,-2) {$\dots$};
+		    % Draw the hidden layer nodes
+		    \foreach \name / \y in {1/1,2/2,4/\text{\tiny n-1},5/n}
+		    \path[yshift=1cm] node [hidden neuron, hoz] (H-\name) at (\layersep,-\name cm) {\color{black}$h_\y$};
+		    \node [output neuron, hoz] at (3.8,-5) {\color{black}$\mathbf{b}^{(2)}$};
+		    \node [hidden neuron, hoz] at (1.3,-5) {\color{black}$\mathbf{b}^{(1)}$};
+		    \path[yshift=1cm]
+		      node[hoz] () at (\layersep,-3 cm) {$\dots$};
+% 		    \path[yshift=0.5cm]
+% 		      node[hoz] () at (\layersep,-5 cm) {$\dots$};
+
+
+		    %%%%%%%%%% Draw the output layer nodes
+		    \foreach \name / \y in {1/1,2/2,3/3,4/4}
+		    \path[yshift=0.5cm] node [output neuron, hoz](O-\name) at (\layersept,-\name cm){\color{black}$y_\y$};
+
+		    % 		      \node[output neuron,hoz] () at (\layersept,-3 cm) {$\dots$};
+					  
+		    \path node[hoz,right] at (1.3,1) {\color{black}$\mathbf{W}^{(1)}$};      
+		    \path node[hoz,right] at (3.8,1) {\color{black}$\mathbf{W}^{(2)}$}; 
+		    \path node[hoz,right] at (\layersep,-4.5 cm) {\includegraphics[width=0.2\textwidth]{activation.png}}; 
+		    
+		    
+		    % Connect every node in the input layer with every node in the  hidden layer.
+			\foreach \source in {1,3}
+			    \foreach \dest in {1,2,4,5}
+				\path[->] (I-\source.north) edge (H-\dest.south);
+			\foreach \source in {1,2,4,5}
+			  \foreach \dest in {1,2,3,4}
+			      \path[->] (H-\source.north) edge (O-\dest.south);
+		    \end{tikzpicture}
+		    }
+	  \end{columns}\vspace{5mm}
+	  \begin{columns}[T]
+	   \column{3in}
+		Output layer activation of single hidden layer:
+		 \begin{align} 
+		 \hat{y}(\x) = o(\mathbf{W}^{(2)}\h^{(1)} + \mathbf{b}^{(2)} )\nonumber
+		 \end{align}
+		 Output layer activation of $N$ hidden layers:
+		 \begin{align} 
+		 \hat{y}(\x) = o(\mathbf{W}^{(N+1)}\h^{(N)} + \mathbf{b}^{(N+1)} )\nonumber
+		 \end{align}
+	    \column{1.5in}
+	  \end{columns}
+
+	  
+% 	  \begin{minipage}{0.45\linewidth}
+% 		\begin{figure}
+% 		      \includegraphics{}
+% 		\end{figure}
+% 	  \end{minipage}
+
+	\end{frame}
+	\begin{frame}[t]{Training}
+		\textcolor{blue}{\Large Empirical Risk Minimization}
+		\begin{itemize}
+		 \item learning algorithms\\
+		 \begin{eqnarray}
+			\text{arg}~\underset{\btheta}{\mathrm{min}} \frac{1}{M}\sum_m l(\hat{y}(\x^{(m)};\btheta),y^{(m)}) + \lambda \Omega(\btheta)\nonumber
+			\end{eqnarray}
+		 \item loss function $l(\hat{y}(\x^{(m)};\btheta),y^{(m)})$ \\
+			for sigmoid activation $l(\btheta)= \sum_m \frac{1}{2} \left\| y^{(m)}-\hat{y}^{(m)}\right\| ^2$\\
+		 \item regularizer $\lambda \Omega(\btheta)$
+		\end{itemize}
+		
+		\txtcolb{Optimization}
+		\begin{itemize}
+		 \item Gradient calculation with Backpropagation
+		 \item Stochastic/Mini-batch gradient descent
+		\end{itemize}
+
+		
+		
+	\end{frame}
+	
+	
+	\subsection{Problems and Solutions}
+		
+	\begin{frame}[t]{Unsupervised Layerwise Pre-training}
+		\begin{minipage}[h]{\linewidth}
+		\txtcolb{Vanishing Gradient}
+			\begin{itemize}
+				\item Training time increases as network gets deeper
+				\item Gradient shrink exponentially and training end up local minima
+				\item Caused by random initialization of network parameters
+			\end{itemize}
+		\end{minipage}\vspace{5mm}
+		\begin{minipage}[h]{\linewidth}
+		\only<1-1>{
+		\begin{figure}
+		 \includegraphics[width=0.6\textwidth]{GradVanishing.png}
+		\end{figure}
+
+		}
+		\visible<2->{
+		\txtcolb{Unsupervised layerwise pre-training}
+		\begin{itemize}
+		 \itemsep8pt
+		 \item Pretrain the deep network layer by layer to build a stacked auto-encoder
+		 \item Each layer is trained as a single hidden layer auto-encoder by minimizing average reconstruction error:\\
+		      $\mathrm{min}~l_{AE} = \sum_m \frac{1}{2}\left\|\x^{(m)}-\hat{\x}^{(m)}\right\|^2$
+		 \item Fine-tuning the entire deep network with supervised training
+		\end{itemize}
+		}
+		\end{minipage}		
+	\end{frame}
+
+% 		\begin{itemize}
+% 			\item Optimization problem non-convex\\
+% 			$\Rightarrow$ getting stuck in poor local minima
+% 			\item Diffusion of gradients
+% 			\item Large p small n problem $\Rightarrow$ overfitting
+% 	
+% 	\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%Noob pictures for pretraining%%%%%%%%%%%%%%%
+	\begin{frame}[t]{Pre-training}
 % 	 \includegraphics[width=0.9\linewidth]{layerwisewhole.png}
-% 	\end{frame}
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% 	
-% 	\begin{frame}[t]{Regularization}
-% 		\begin{minipage}[h]{\linewidth}
-% 		\txtcolb{Overfitting}
-% 			\begin{itemize}
-% 				\item Huge amount of parameters in deep network
-% 				\item Not enough data for training
-% 				\item Poor generalization 
-% 			\end{itemize}
-% 		\end{minipage}\vspace{5mm}
-% 		\visible<2->{
-% 		\begin{minipage}[h]{\linewidth}
-% 		\txtcolb{Regularization}
-% 			\begin{itemize}
-% 			\item Add weight penalization $\lambda \left\| \mathbf{w} \right\| _{p}$ to loss function 
-% 			      \begin{eqnarray}
-% 			      \text{arg}~\underset{\btheta}{\mathrm{min}} \frac{1}{M}\sum_m l(\hat{y}(\x^{(m)};\btheta),y^{(m)}) + \lambda \left\| \mathbf{w} \right\| _{p}\nonumber
-% 			      \end{eqnarray}
-% 			\item 	In convex optimization:
-% 	 		\begin{eqnarray}
-% 			\text{arg}~\underset{\btheta}{\mathrm{min}} \frac{1}{M}\sum_m l(\hat{y}(\x^{(m)};\btheta),y^{(m)}),  s.t. \left\|\mathbf{w}\right\|_p \leq C\nonumber
-% 			\end{eqnarray}
-% 			\end{itemize}
-% 		\end{minipage}	
-% 		}
-% 	\end{frame}
-% 	
-% 	\begin{frame}[t]{Regularization}
-% 	\txtcolb{P-Norm}
-% 	\begin{eqnarray}
-% 			      \left\| \mathbf{w} \right\| _{p} := \left( \sum_{n=1}^{n} |w_{i}|^{p} \right) ^{1/p} = \sqrt[p]{|w_1|^p +,..., +|w_n|^p}\nonumber
-% 	\end{eqnarray}
-% 	Widely used: L1- and L2-regularization ($p=1$ and $p=2$)
-% 	\begin{figure}[t]
-% 	\includegraphics<1>[width=0.7\linewidth]{contoursreg.png}
-% 	\includegraphics<2>[width=0.7\linewidth]{l1vsl2.png}
-% % 	 \only<1-1>{\includegraphics[width=0.7\linewidth]{contoursreg.png}}
-% % 	 \only<2->{\includegraphics[width=0.7\linewidth]{l1vsl2.png}}
-% 	\end{figure}
-% 
-% 	\end{frame}
+	    \begin{columns}
+	     \column{2in}
+		\begin{figure}
+		 \subfig
+		\end{figure}
 
+	    \end{columns}
 
-% \section{Long Short Term Memory}
-% 	\subsection{Recurrent Neural Network}
-% 		\begin{frame}[t]{Recurrent Neural Network}
-% % 			\begin{minipage}[t][][t]{0.48\linewidth}
-% 			\textcolor{blue}{\Large Concepts of RNN}
-% 				\begin{itemize}[<+->]
-% % 				 \itemsep10pt
-% 				 \item modelling sequential data, emotion in speech .
-% 				 \item Same Structure as MLP but differs from feed-forward network, enabling
-% nonlinear mapping
-% 				 \only<2-2>{
-% 					\begin{eqnarray}
-% 						&h_{t} = \mathcal{H}(W_{xh}x_{t}+W_{hh}h_{t-1} + b_{h})\nonumber\\
-% 						&y_{t} = W_{hy}h_{t} + b_{y}\nonumber
-% 					\end{eqnarray}
-% 				 }
-% 				
-% 				 \item Feedback connection between previous hidden units and current hidden units, enabling
-% memory past hidden state.
-% 				 \item Potentially to model arbitary dynamic system.
-% 				 \item Trained with \textbf{b}ack\textbf{p}ropagation \textbf{t}hrough \textbf{t}ime (BPTT)
-% 				 \note{natural extension of BP in FF network}
-% 				\end{itemize}
+	\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	
+	\begin{frame}[t]{Regularization}
+		\begin{minipage}[h]{\linewidth}
+		\txtcolb{Overfitting}
+			\begin{itemize}
+				\item Huge amount of parameters in deep network
+				\item Not enough data for training
+				\item Poor generalization 
+			\end{itemize}
+		\end{minipage}\vspace{5mm}
+		\visible<2->{
+		\begin{minipage}[h]{\linewidth}
+		\txtcolb{Regularization}
+			\begin{itemize}
+			\item Add weight penalization $\lambda \left\| \mathbf{w} \right\| _{p}$ to loss function 
+			      \begin{eqnarray}
+			      \text{arg}~\underset{\btheta}{\mathrm{min}} \frac{1}{M}\sum_m l(\hat{y}(\x^{(m)};\btheta),y^{(m)}) + \lambda \left\| \mathbf{w} \right\| _{p}\nonumber
+			      \end{eqnarray}
+			\item 	In convex optimization:
+	 		\begin{eqnarray}
+			\text{arg}~\underset{\btheta}{\mathrm{min}} \frac{1}{M}\sum_m l(\hat{y}(\x^{(m)};\btheta),y^{(m)}),  s.t. \left\|\mathbf{w}\right\|_p \leq C\nonumber
+			\end{eqnarray}
+			\end{itemize}
+		\end{minipage}	
+		}
+	\end{frame}
+	
+	\begin{frame}[t]{Regularization}
+	\txtcolb{P-Norm}
+	\begin{eqnarray}
+			      \left\| \mathbf{w} \right\| _{p} := \left( \sum_{n=1}^{n} |w_{i}|^{p} \right) ^{1/p} = \sqrt[p]{|w_1|^p +,..., +|w_n|^p}\nonumber
+	\end{eqnarray}
+	Widely used: L1- and L2-regularization ($p=1$ and $p=2$)
+	\begin{figure}[t]
+	\includegraphics<1>[width=0.7\linewidth]{contoursreg.png}
+	\includegraphics<2>[width=0.7\linewidth]{l1vsl2.png}
+% 	 \only<1-1>{\includegraphics[width=0.7\linewidth]{contoursreg.png}}
+% 	 \only<2->{\includegraphics[width=0.7\linewidth]{l1vsl2.png}}
+	\end{figure}
+
+	\end{frame}
+
+% 
+% % \section{Long Short Term Memory}
+% % 	\subsection{Recurrent Neural Network}
+% % 		\begin{frame}[t]{Recurrent Neural Network}
+% % % 			\begin{minipage}[t][][t]{0.48\linewidth}
+% % 			\textcolor{blue}{\Large Concepts of RNN}
+% % 				\begin{itemize}[<+->]
+% % % 				 \itemsep10pt
+% % 				 \item modelling sequential data, emotion in speech .
+% % 				 \item Same Structure as MLP but differs from feed-forward network, enabling
+% % nonlinear mapping
+% % 				 \only<2-2>{
+% % 					\begin{eqnarray}
+% % 						&h_{t} = \mathcal{H}(W_{xh}x_{t}+W_{hh}h_{t-1} + b_{h})\nonumber\\
+% % 						&y_{t} = W_{hy}h_{t} + b_{y}\nonumber
+% % 					\end{eqnarray}
+% % 				 }
+% % 				
+% % 				 \item Feedback connection between previous hidden units and current hidden units, enabling
+% % memory past hidden state.
+% % 				 \item Potentially to model arbitary dynamic system.
+% % 				 \item Trained with \textbf{b}ack\textbf{p}ropagation \textbf{t}hrough \textbf{t}ime (BPTT)
+% % 				 \note{natural extension of BP in FF network}
+% % 				\end{itemize}
+% % % 			\end{minipage}
+% % \vspace{5mm}
+% % % 		\only<1>{\begin{figure}
+% % % 		          \includegraphics[width=0.5\textwidth]{NeuralNetwork.png}
+% % % 		         \end{figure}
+% % % 
+% % % 		}
+% % 		\end{frame}
+% % 		
+% % 		\begin{frame}[t]{Recurrent Neural Network}
+% % % 			\begin{minipage}[t][][t]{0.48\linewidth}
+% % 			\textcolor{blue}{\Large Concepts of RNN}
+% % 			\begin{minipage}[t]{0.48\linewidth}
+% % 				\only<1>{
+% % 				\begin{figure}[t]
+% % 				\includegraphics[width=0.8\textwidth]{RNNunit.png}
+% % 				\end{figure}
+% % 				}
+% % 			\end{minipage}\hfill
+% % 			\begin{minipage}[t]{0.48\linewidth}
+% % 				\only<1>{
+% % 				\begin{figure}[t]
+% % 				\includegraphics[width=\textwidth]{RNNStruct.png}
+% % 				\end{figure}
+% % 				}
 % % 			\end{minipage}
-% \vspace{5mm}
-% % 		\only<1>{\begin{figure}
-% % 		          \includegraphics[width=0.5\textwidth]{NeuralNetwork.png}
-% % 		         \end{figure}
+% % 
+% % 		\end{frame}
+% % 		
+% % 		\begin{frame}[t]{From RNN to LSTM}
+% % 		\textcolor{blue}{\Large Problems with RNN}
+% % 			\begin{itemize}%[<+->]
+% % 			 \item gradient vanishing during backpropagation as time steps increases (>100)
+% % 			 \item difficult to capture long-time dependency (which is required in emotion recognition)
+% % 			\end{itemize}
+% % 		\textcolor{red}{\Large Solutions}	
+% % 			\begin{itemize}
+% % 			 \item 
+% % 			\end{itemize}
+% %     
+% %     
+% % 		\end{frame}
+% % 		\begin{frame}{Long short term memory}
+% % 		\only<1>{S. Hochreiter and J. Schmidhuber, Lovol. 9, pp. 1735-1780, 1997.}
+% % 		\uncover<2->{
+% % 		\textcolor{blue}{\Large LSTM unit}\\
+% % 		\begin{minipage}{0.4\linewidth}
+% % 			\begin{figure}
+% % 			 \includegraphics[width=\linewidth]{LSTMstruct.png}
+% % 			\end{figure}
+% % 		\end{minipage}
+% % 		\begin{minipage}[t]{0.55\linewidth}
+% % 			\begin{figure}
+% % 			 \begin{eqnarray}
+% % 				  i_{t} &=& \sigma (W_{xi}x_{t} + W_{hi}h_{t-1} + W_{ci}c_{t-1} +b_{i})\nonumber\\
+% % 				  f_{t} &=& \sigma (W_{xf}x_{t} + W_{hf}h_{t-1} + W_{cf}c_{t-1} +b_{f})\nonumber\\
+% % 				  c_{t} &=& f_{t}c_{t-1} + i_{t}\mathrm{tanh}(W_{xc}x_{t} + W_{hc}h_{t-1} + b_{c})\nonumber\\
+% % 				  o_{t} &=& \sigma (W_{xo}x_{t} + W_{ho}h_{t-1} + W_{co}c_{t} +b_{o})\nonumber\\
+% % 				  h_{t} &=& o_{t}\mathrm{tanh} (c_{t})\nonumber
+% % 			 \end{eqnarray}
+% % 			\end{figure}
+% % 		\end{minipage}
 % % 
 % % 		}
-% 		\end{frame}
-% 		
-% 		\begin{frame}[t]{Recurrent Neural Network}
-% % 			\begin{minipage}[t][][t]{0.48\linewidth}
-% 			\textcolor{blue}{\Large Concepts of RNN}
-% 			\begin{minipage}[t]{0.48\linewidth}
-% 				\only<1>{
-% 				\begin{figure}[t]
-% 				\includegraphics[width=0.8\textwidth]{RNNunit.png}
-% 				\end{figure}
-% 				}
-% 			\end{minipage}\hfill
-% 			\begin{minipage}[t]{0.48\linewidth}
-% 				\only<1>{
-% 				\begin{figure}[t]
-% 				\includegraphics[width=\textwidth]{RNNStruct.png}
-% 				\end{figure}
-% 				}
-% 			\end{minipage}
+% % 		\end{frame}
+% % 		
+% % 		\begin{frame}[t]{Long short term memory}
+% % 		\textcolor{blue}{\Large Features in LSTM}
+% % 		 \begin{itemize}
+% % 		  \item gates are trained to learn when it shoud be open/closed. 
+% % 		  \item Constant Error Carousel
+% % 		  \item preserve long-time dependency by maintaining gradient over time. 
+% % 		 \end{itemize}
+% % 		 \begin{figure}
+% % 		  \includegraphics[width=\textwidth]{LSTMGra.png}
+% % 		 \end{figure}
+% % 
+% % 
+% % 		\end{frame}
 % 
-% 		\end{frame}
-% 		
-% 		\begin{frame}[t]{From RNN to LSTM}
-% 		\textcolor{blue}{\Large Problems with RNN}
-% 			\begin{itemize}%[<+->]
-% 			 \item gradient vanishing during backpropagation as time steps increases (>100)
-% 			 \item difficult to capture long-time dependency (which is required in emotion recognition)
-% 			\end{itemize}
-% 		\textcolor{red}{\Large Solutions}	
-% 			\begin{itemize}
-% 			 \item 
-% 			\end{itemize}
-%     
-%     
-% 		\end{frame}
-% 		\begin{frame}{Long short term memory}
-% 		\only<1>{S. Hochreiter and J. Schmidhuber, Lovol. 9, pp. 1735-1780, 1997.}
-% 		\uncover<2->{
-% 		\textcolor{blue}{\Large LSTM unit}\\
-% 		\begin{minipage}{0.4\linewidth}
-% 			\begin{figure}
-% 			 \includegraphics[width=\linewidth]{LSTMstruct.png}
-% 			\end{figure}
-% 		\end{minipage}
-% 		\begin{minipage}[t]{0.55\linewidth}
-% 			\begin{figure}
-% 			 \begin{eqnarray}
-% 				  i_{t} &=& \sigma (W_{xi}x_{t} + W_{hi}h_{t-1} + W_{ci}c_{t-1} +b_{i})\nonumber\\
-% 				  f_{t} &=& \sigma (W_{xf}x_{t} + W_{hf}h_{t-1} + W_{cf}c_{t-1} +b_{f})\nonumber\\
-% 				  c_{t} &=& f_{t}c_{t-1} + i_{t}\mathrm{tanh}(W_{xc}x_{t} + W_{hc}h_{t-1} + b_{c})\nonumber\\
-% 				  o_{t} &=& \sigma (W_{xo}x_{t} + W_{ho}h_{t-1} + W_{co}c_{t} +b_{o})\nonumber\\
-% 				  h_{t} &=& o_{t}\mathrm{tanh} (c_{t})\nonumber
-% 			 \end{eqnarray}
-% 			\end{figure}
-% 		\end{minipage}
-% 
-% 		}
-% 		\end{frame}
-% 		
-% 		\begin{frame}[t]{Long short term memory}
-% 		\textcolor{blue}{\Large Features in LSTM}
-% 		 \begin{itemize}
-% 		  \item gates are trained to learn when it shoud be open/closed. 
-% 		  \item Constant Error Carousel
-% 		  \item preserve long-time dependency by maintaining gradient over time. 
-% 		 \end{itemize}
-% 		 \begin{figure}
-% 		  \includegraphics[width=\textwidth]{LSTMGra.png}
-% 		 \end{figure}
-% 
-% 
-% 		\end{frame}
-
 % \section{Experiments}
+% 	\begin{frame}[t]{Experiment Setup}
+% 	      \begin{itemize}
+% 	       \item Batch-wise training
+% 	      \end{itemize}
+% 
+% 	\end{frame}
+% 
+% 	
 % 	\begin{frame}[t]{Experiment Setup}
 % 	\begin{minipage}[t]{\linewidth}
 % 	 \begin{itemize}[<+->]
@@ -828,9 +930,9 @@
 % 		\end{table}
 % 	      }
 % 	\end{frame}
-
-
-
+% 
+% 
+% 
 \section{Conclusion and Outlook}
       \begin{frame}[t]{Conclusion}
 	  \begin{itemize}
