@@ -35,6 +35,7 @@
 \usepackage{graphicx}
 \usepackage{setspace}
 \usepackage{tikz}
+\usepackage{booktabs}
 \usetikzlibrary{calc}
 \def\layersep{2.5cm}
 \def\layersept{5cm}
@@ -54,52 +55,74 @@
 
 
 % -----------------------------------------------------------------------------
-% Motivation slide
-\begin{frame}[t]{Motivation}
-\tikzset{neuron/.style={circle,thick,fill=black!25,minimum size=17pt,inner sep=0pt},
-    input neuron/.style={neuron, draw,thick, fill=gray!30},
-    hidden neuron/.style={neuron,fill=white,draw},
-    output neuron/.style={neuron,draw,thick,fill=black!20},
-    hoz/.style={rotate=-90}}   %<--- for labels
-
-\begin{tikzpicture}[-,draw=black, node distance=\layersep,transform shape,rotate=90]  %<-- rotate the NN
-
-% Draw the input layer nodes
-\foreach \name / \y in {1/1,2/2,3/3,5/m}
-\node[input neuron, hoz] (I-\name) at (0,-\name) {\color{black}$x_\y$};
-
-\node[hoz] (I-4) at (0,-4) {$\dots$};
-
-% Draw the hidden layer nodes
-\foreach \name / \y in {1/1,2/2,3/3,6/n}
-\path[yshift=0.5cm] node [hidden neuron, hoz] (H-\name) at (\layersep,-\name cm) {\color{black}$h_\y$};
-
-\path[yshift=0.5cm]
-   node[hoz] () at (\layersep,-4 cm) {$\dots$};
-\path[yshift=0.5cm]
-   node[hoz] () at (\layersep,-5 cm) {$\dots$};
-
-
-%%%%%%%%%% Draw the output layer nodes
-		      \foreach \name / \y in {1/1,2/2,3/3,4/4}
-		      \path[yshift=-0.5cm] node [output neuron, hoz](O-\name) at (\layersept,-\name cm){\color{black}$y_\y$};
-
-% 		      \node[output neuron,hoz] () at (\layersept,-3 cm) {$\dots$};
-		      
-\path node[hoz,right] at ($(I-5)!0.5!(H-6)$) {\color{black}$\mathbf{W}^{(1)}$};      
-\path node[hoz,right] at ($(H-6)!0.5!(O-4)$) {\color{black}$\mathbf{W}^{(2)}$}; 
-\path node[hoz,right] at (\layersep + 0.3 cm,-6 cm) {\color{black}Activation\includegraphics[width=0.1\textwidth]{activation.png}}; 
-% Connect every node in the input layer with every node in the  hidden layer.
-    \foreach \source in {1,2,3,5}
-        \foreach \dest in {1,2,3,6}
-            \path (I-\source.north) edge (H-\dest.south);
-    \foreach \source in {1,2,3,6}
-      \foreach \dest in {1,2,3,4}
-	  \path (H-\source.north) edge (O-\dest.south);
-\end{tikzpicture}
-
+% % Motivation slide
+% \begin{frame}[t]{Motivation}
+% \tikzset{neuron/.style={circle,thick,fill=black!25,minimum size=17pt,inner sep=0pt},
+%     input neuron/.style={neuron, draw,thick, fill=gray!30},
+%     hidden neuron/.style={neuron,fill=white,draw},
+%     output neuron/.style={neuron,draw,thick,fill=black!20},
+%     hoz/.style={rotate=-90}}   %<--- for labels
+% 
+% \begin{tikzpicture}[-,draw=black, node distance=\layersep,transform shape,rotate=90]  %<-- rotate the NN
+% 
+% % Draw the input layer nodes
+% \foreach \name / \y in {1/1,2/2,3/3,5/m}
+% \node[input neuron, hoz] (I-\name) at (0,-\name) {\color{black}$x_\y$};
+% 
+% \node[hoz] (I-4) at (0,-4) {$\dots$};
+% 
+% % Draw the hidden layer nodes
+% \foreach \name / \y in {1/1,2/2,3/3,6/n}
+% \path[yshift=0.5cm] node [hidden neuron, hoz] (H-\name) at (\layersep,-\name cm) {\color{black}$h_\y$};
+% 
+% \path[yshift=0.5cm]
+%    node[hoz] () at (\layersep,-4 cm) {$\dots$};
+% \path[yshift=0.5cm]
+%    node[hoz] () at (\layersep,-5 cm) {$\dots$};
+% 
+% 
+% %%%%%%%%%% Draw the output layer nodes
+% 		      \foreach \name / \y in {1/1,2/2,3/3,4/4}
+% 		      \path[yshift=-0.5cm] node [output neuron, hoz](O-\name) at (\layersept,-\name cm){\color{black}$y_\y$};
+% 
+% % 		      \node[output neuron,hoz] () at (\layersept,-3 cm) {$\dots$};
+% 		      
+% \path node[hoz,right] at ($(I-5)!0.5!(H-6)$) {\color{black}$\mathbf{W}^{(1)}$};      
+% \path node[hoz,right] at ($(H-6)!0.5!(O-4)$) {\color{black}$\mathbf{W}^{(2)}$}; 
+% \path node[hoz,right] at (\layersep + 0.3 cm,-6 cm) {\color{black}Activation\includegraphics[width=0.1\textwidth]{activation.png}}; 
+% % Connect every node in the input layer with every node in the  hidden layer.
+%     \foreach \source in {1,2,3,5}
+%         \foreach \dest in {1,2,3,6}
+%             \path (I-\source.north) edge (H-\dest.south);
+%     \foreach \source in {1,2,3,6}
+%       \foreach \dest in {1,2,3,4}
+% 	  \path (H-\source.north) edge (O-\dest.south);
+% \end{tikzpicture}
+% 
+% \end{frame}
+% 
+\begin{frame}[t]
+\begin{table}[htbp]\centering
+ \centering
+ \caption{Comparison of commonly used models for feature learning}
+ \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
+%     & \multicolumn{5}{c}{\textit{\tiny{Classfied}}} \\[1ex]
+    \toprule
+    &Model & Temporal Dependency & Memory & Generaltive \\
+    \midrule
+%     \cmidrule{2-12}
+    & ANN		& -	&-	& -	\\
+    & RBM             	& - 	& - 	&  \OK   \\
+    & CRBM         	& \OK 	& 2-5 	& \OK     \\
+    & AE         	& - 	& -  	&  - 	   \\
+    & RNN           	& \OK 	& 1-100	&  -	  \\
+    & LSTM		& \OK	& 1-1000& -	\\
+    \bottomrule
+%     \cmidrule[1pt]{2-12}
+  \end{tabular*}
+\label{tab:modelcompare}
+\end{table}
 \end{frame}
-
 
 % -----------------------------------------------------------------------------
 %
