@@ -85,34 +85,34 @@
 
 % -----------------------------------------------------------------------------
 % Motivation slide
-% \begin{frame}[t]{Motivation} % 1 folie
-% % \textcolor{blue}{\Large Training objective}
-% \only<1-1>{
-% \textcolor{blue}{\Large Speech Emotion Recognition}\\
-% 	\begin{itemize}
-% 		\itemsep20pt
-% % 		\item Most current work focuses on speech processing based on linguistic information,  e.g.: Skype Translator
-% 		\item More natural human-machine interaction requires paralinguistic information such as age, gender, emotion.
-% 		\item Emotion data are high-dimensional complex data with non-linear temporal hidden features
-% 		\item GMM is insufficient
-% % 		\item Speech Recognition / Speeker Identification / Emotion Recognition
-% 		\only<1-1>{\begin{figure}[b]
-% 		 \includegraphics[width=0.6\linewidth]{paraliguistic.png}
-% 		\end{figure}}
-% 
-% 	\end{itemize}
-% }
-% 
-% \only<2-2>{
-% \textcolor{blue}{\Large Deep Learning}\\
-% 	\begin{itemize}
-% 	    \itemsep15pt
-% 	    \item New research area of machine learning (from shallow to deep structure)
-% 	    \item Deep architecture for extracting complex structure and building internal representations via unsupervised learning
-% 	    \item Widely applied in vision/audition processing, e.g. handwriting recognition (Graves, Alex, et al. 2009), traffic sign classification (Schmidhuber, et al. 2011), text translation (Google, 2014)
-% 	\end{itemize}
-% }
-% \end{frame}
+\begin{frame}[t]{Motivation} % 1 folie
+% \textcolor{blue}{\Large Training objective}
+\only<1-1>{
+\textcolor{blue}{\Large Speech Emotion Recognition}\\
+	\begin{itemize}
+		\itemsep15pt
+% 		\item Most current work focuses on speech processing based on linguistic information,  e.g.: Skype Translator
+		\item More natural human-machine interaction requires paralinguistic information such as age, gender, emotion.
+		\item Emotion data are high-dimensional complex data with non-linear temporal hidden features
+		\item GMM is not sufficient enoug to modelling speech emotion
+% 		\item Speech Recognition / Speeker Identification / Emotion Recognition
+		\only<1-1>{\begin{figure}[b]
+		 \includegraphics[width=0.6\linewidth]{paraliguistic.png}
+		\end{figure}}
+
+	\end{itemize}
+}
+
+\only<2-2>{
+\textcolor{blue}{\Large Deep Learning}\\
+	\begin{itemize}
+	    \itemsep15pt
+	    \item New research area of machine learning (from shallow to deep structure)
+	    \item Deep architecture for extracting complex structure and building internal representations via unsupervised learning
+	    \item Widely applied in vision/audition processing, e.g. handwriting recognition (Graves, Alex, et al. 2009), traffic sign classification (Schmidhuber, et al. 2011), text translation (Google, 2014)
+	\end{itemize}
+}
+\end{frame}
 
 % -----------------------------------------------------------------------------
 % This is the table of contents. You can insert a motivation before or after this slide.
@@ -141,44 +141,54 @@
 }
 
 %% =========
-% \section{Foundations} %2 folies
-% % -----------------------------------------------------------------------------
-% % \subsection{Mel Frequency Cepstral Features}
-% 	\begin{frame}[t]{Mel Frequency Cepstral Features}
-% 		\begin{minipage}[t]{0.48\linewidth}
-% 			\begin{itemize}
-% 				\item short-term power spectrum 
-% 				\item mel-scale approximate human perception
-% 				\item widely-used in speech recognition tasks
-% 				\item Transformation between Mel and Hertz scale
-% 				\begin{figure}
+\section{Foundations} %1 F
+% -----------------------------------------------------------------------------
+	\begin{frame}[t]{Foundations}
+	\txtcolb{Mel Frequency Cepstral Coefficients}
+			\begin{itemize}
+				\item most commonly used features in speech emotion analysis 
+				\item short-term power spectrum based on frame
+				\item mel-scale approximate human perception
+				\begin{align}
+				f_{mel} = 1125~\ln~(1+f_{Hz}/700)\nonumber
+				\end{align}
+			\end{itemize}
+
+		\begin{figure}
+		 \includegraphics[width = 0.5\linewidth]{MelvsHz.png}
+		\end{figure}
+	\end{frame}
+	
+	
+	\begin{frame}[t]{Pre-processing for MFCCs}
+	\txtcolb{Steps to MFCCs}
+		      \begin{enumerate}
+		      \item Convert speech signal with overlapped window to frames ($20ms$ frame length, $10ms$ shifting).
+		      \item Calculate power spectrum for each frame with DFT and take the logarithm value.
+		      \item Apply Mel filterbank to the power spectrum, sum the power in each filter.
+		      \item Decorrelation by applying Discrete Cosine Transform (DCT) to the logarithm of the filter powers.
+		      \item Keep coefficients $1-20$ of DCT and discard the rest.
+		      \end{enumerate}
+
+		      \begin{figure}[htbp]
+		      \includegraphics[width= \textwidth]{mfcc.png}
+		      \end{figure}
+	\end{frame}
+	
+	\begin{frame}[t]{Foundations}
+	\txtcolb{Framework of Emotion Recognition}
+	      \begin{itemize}
+	       \item Pre-processing of emotion data to extract MFCC features
+	       \item Model data distribution based on MFCCs via unsupervised learning
+	       \item Classification with supervised learning
+	      \end{itemize}
+	      \vspace{10mm}
+	      \includegraphics[width=\linewidth]{Framework.png}
+
+	\end{frame}
 % 
-% 				\begin{eqnarray}
-% 				f_{mel} = 1125~\ln~(1+f_{Hz}/700)\nonumber\\
-% 				f_{Hz} = 700 \left(\exp(f_{mel}/1125)-1\right)\nonumber
-% 				\end{eqnarray}
 % 
-% 			\end{figure}
-% 			\end{itemize}
-% 		\end{minipage}
-% 		\begin{minipage}[t]{0.48\linewidth}
-% 		\begin{figure}
-% 		 \includegraphics[width = \linewidth]{MelvsHz.png}
-% 		\end{figure}
-% 		\end{minipage}
-% 	\end{frame}
-% 	
-% 	\begin{frame}[t]{Framework}
-% 	      \begin{itemize}
-% 	       \item Pre-processing of emotion data to extract MFCC features
-% 	       \item Model data distribution based on MFCCs via unsupervised learning
-% 	       \item Classification with supervised learning
-% 	      \end{itemize}
-% 
-% 	\end{frame}
 % % 
-% % 
-% % % 
 % \subsection{Emotion Recognition Approaches}
 % 
 % \begin{frame}[t]{Emotion Recognition Approaches}
@@ -202,11 +212,11 @@
 % 
 % 	\end{minipage}
 % \end{frame}
-% 
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conditional Restricted Boltzmann Machine} %% 
 \subsection{Restricted Boltzmann Machine}
-	\begin{frame}[t]{Concepts}
+	\begin{frame}[t]{Restricted Boltzmann Machine}
 	 \begin{itemize}
 	  \itemsep10pt
 	  \item Generative graphical model, capture data distrbution $P(\x|\boldsymbol{\theta})$
@@ -219,7 +229,7 @@
 	  \item Successfully applied in motion capture (Graham W. Taylor, Geoffrey E. Hinton, 2006)
 % 	  \item speicifies a joint distribution over input and hidden variables, can either generating data, or with bayesian
 % rule to form conditional distribution. 
-	  \item Potential to be extend to capture temporal information
+	  \item non-temporal, but is potential to be extended to capture temporal information
 	 \end{itemize}
 	\end{frame}
 	
@@ -230,8 +240,8 @@
 	    \end{figure}
 	    \only<1-1>
 	    {\begin{align}
-	      \x \in \{0,1\}\nonumber\\
-	      \h \in \{0,1\}\nonumber
+	      &\text{Visible/Input} &~\x \in \{0,1\}\nonumber\\
+	      &\text{Hidden} &~\h \in \{0,1\}\nonumber
 	     \end{align}
 
 	    }
@@ -471,7 +481,7 @@
 %   
 % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% =========
 
-\section{Multilayer Neural Network}%4 folies
+\section{Deep Neural Network}%4 folies
 	\subsection{Function and Training}		
 	\begin{frame}[t]{Structure and Function}
 % 	\txtcolb{N-hidden layers neural network }
@@ -682,104 +692,99 @@
 
 
 \section{Long Short Term Memory}
-	\subsection{Recurrent Neural Network}
-		\begin{frame}[t]{Recurrent Neural Network}
-% 			\begin{minipage}[t][][t]{0.48\linewidth}
-			\textcolor{blue}{\Large Concepts of RNN}
-				\begin{itemize}[<+->]
-% 				 \itemsep10pt
-				 \item modelling sequential data, emotion in speech .
-				 \item Same Structure as MLP but differs from feed-forward network, enabling
-nonlinear mapping
-				 \only<2-2>{
-					\begin{eqnarray}
-						&h_{t} = \mathcal{H}(W_{xh}x_{t}+W_{hh}h_{t-1} + b_{h})\nonumber\\
-						&y_{t} = W_{hy}h_{t} + b_{y}\nonumber
-					\end{eqnarray}
-				 }
-				
-				 \item Feedback connection between previous hidden units and current hidden units, enabling
-memory past hidden state.
-				 \item Potentially to model arbitary dynamic system.
-				 \item Trained with \textbf{b}ack\textbf{p}ropagation \textbf{t}hrough \textbf{t}ime (BPTT)
-				 \note{natural extension of BP in FF network}
-				\end{itemize}
+% 		\begin{frame}[t]{Recurrent Neural Network}
+% % 			\begin{minipage}[t][][t]{0.48\linewidth}
+% 			\textcolor{blue}{\Large Concepts of RNN}
+% 				\begin{itemize}[<+->]
+% % 				 \itemsep10pt
+% 				 \item modelling sequential data, emotion in speech .
+% 				 \item Same Structure as MLP but differs from feed-forward network, enabling
+% nonlinear mapping
+% 				 \only<2-2>{
+% 					\begin{eqnarray}
+% 						&h_{t} = \mathcal{H}(W_{xh}x_{t}+W_{hh}h_{t-1} + b_{h})\nonumber\\
+% 						&y_{t} = W_{hy}h_{t} + b_{y}\nonumber
+% 					\end{eqnarray}
+% 				 }
+% 				
+% 				 \item Feedback connection between previous hidden units and current hidden units, enabling
+% memory past hidden state.
+% 				 \item Potentially to model arbitary dynamic system.
+% 				 \item Trained with \textbf{b}ack\textbf{p}ropagation \textbf{t}hrough \textbf{t}ime (BPTT)
+% 				 \note{natural extension of BP in FF network}
+% 				\end{itemize}
+% % 			\end{minipage}
+% \vspace{5mm}
+% % 		\only<1>{\begin{figure}
+% % 		          \includegraphics[width=0.5\textwidth]{NeuralNetwork.png}
+% % 		         \end{figure}
+% % 
+% % 		}
+% 		\end{frame}
+% 		
+% 		\begin{frame}[t]{Recurrent Neural Network}
+% % 			\begin{minipage}[t][][t]{0.48\linewidth}
+% 			\textcolor{blue}{\Large Concepts of RNN}
+% 			\begin{minipage}[t]{0.48\linewidth}
+% 				\only<1>{
+% 				\begin{figure}[t]
+% 				\includegraphics[width=0.8\textwidth]{RNNunit.png}
+% 				\end{figure}
+% 				}
+% 			\end{minipage}\hfill
+% 			\begin{minipage}[t]{0.48\linewidth}
+% 				\only<1>{
+% 				\begin{figure}[t]
+% 				\includegraphics[width=\textwidth]{RNNStruct.png}
+% 				\end{figure}
+% 				}
 % 			\end{minipage}
-\vspace{5mm}
-% 		\only<1>{\begin{figure}
-% 		          \includegraphics[width=0.5\textwidth]{NeuralNetwork.png}
-% 		         \end{figure}
 % 
-% 		}
-		\end{frame}
-		
-		\begin{frame}[t]{Recurrent Neural Network}
-% 			\begin{minipage}[t][][t]{0.48\linewidth}
-			\textcolor{blue}{\Large Concepts of RNN}
-			\begin{minipage}[t]{0.48\linewidth}
-				\only<1>{
-				\begin{figure}[t]
-				\includegraphics[width=0.8\textwidth]{RNNunit.png}
-				\end{figure}
-				}
-			\end{minipage}\hfill
-			\begin{minipage}[t]{0.48\linewidth}
-				\only<1>{
-				\begin{figure}[t]
-				\includegraphics[width=\textwidth]{RNNStruct.png}
-				\end{figure}
-				}
-			\end{minipage}
+% 		\end{frame}
+    
+    
 
-		\end{frame}
-		
-		\begin{frame}[t]{From RNN to LSTM}
-		\textcolor{blue}{\Large Problems with RNN}
+		\begin{frame}[t]{Long short term memory}
+		    \only<1-2>
+		    {\textcolor{blue}{\Large Problems with RNN}
 			\begin{itemize}%[<+->]
 			 \item gradient vanishing during backpropagation as time steps increases (>100)
 			 \item difficult to capture long-time dependency (which is required in emotion recognition)
 			\end{itemize}
-		\textcolor{red}{\Large Solutions}	
-			\begin{itemize}
-			 \item 
-			\end{itemize}
-    
-    
-		\end{frame}
-		\begin{frame}{Long short term memory}
-		\only<1>{S. Hochreiter and J. Schmidhuber, Lovol. 9, pp. 1735-1780, 1997.}
-		\uncover<2->{
-		\textcolor{blue}{\Large LSTM unit}\\
-		\begin{minipage}{0.4\linewidth}
-			\begin{figure}
-			 \includegraphics[width=\linewidth]{LSTMstruct.png}
-			\end{figure}
-		\end{minipage}
-		\begin{minipage}[t]{0.55\linewidth}
-			\begin{figure}
-			 \begin{eqnarray}
-				  i_{t} &=& \sigma (W_{xi}x_{t} + W_{hi}h_{t-1} + W_{ci}c_{t-1} +b_{i})\nonumber\\
-				  f_{t} &=& \sigma (W_{xf}x_{t} + W_{hf}h_{t-1} + W_{cf}c_{t-1} +b_{f})\nonumber\\
-				  c_{t} &=& f_{t}c_{t-1} + i_{t}\mathrm{tanh}(W_{xc}x_{t} + W_{hc}h_{t-1} + b_{c})\nonumber\\
-				  o_{t} &=& \sigma (W_{xo}x_{t} + W_{ho}h_{t-1} + W_{co}c_{t} +b_{o})\nonumber\\
-				  h_{t} &=& o_{t}\mathrm{tanh} (c_{t})\nonumber
-			 \end{eqnarray}
-			\end{figure}
-		\end{minipage}
-
-		}
+		    }
+		    \only<2-2>
+			{\vspace{5mm}S. Hochreiter and J. Schmidhuber, Lovol. 9, pp. 1735-1780, 1997.\\
+			}
+		    \only<3->{
+		    \includegraphics<3>[scale=0.35]{LSTMstruct.png}
+		    \begin{columns}[T]
+			\column{1.5in}
+			 \includegraphics<4>[width=\linewidth]{LSTMstruct.png}
+			 \only<4->{
+			 \column{1.5in}
+			 \begin{align}
+				  i_{t} &= \sigma (W_{xi}x_{t} + W_{hi}h_{t-1} + W_{ci}c_{t-1} +b_{i})\nonumber\\
+				  f_{t} &= \sigma (W_{xf}x_{t} + W_{hf}h_{t-1} + W_{cf}c_{t-1} +b_{f})\nonumber\\
+				  c_{t} &= f_{t}c_{t-1} + i_{t}\mathrm{tanh}(W_{xc}x_{t} + W_{hc}h_{t-1} + b_{c})\nonumber\\
+				  o_{t} &= \sigma (W_{xo}x_{t} + W_{ho}h_{t-1} + W_{co}c_{t} +b_{o})\nonumber\\
+				  h_{t} &= o_{t}\mathrm{tanh} (c_{t})\nonumber
+			 \end{align}
+			 } 
+		      \end{columns}
+		     } 
 		\end{frame}
 		
 		\begin{frame}[t]{Long short term memory}
 		\textcolor{blue}{\Large Features in LSTM}
-		 \begin{itemize}
-		  \item gates are trained to learn when it shoud be open/closed. 
-		  \item Constant Error Carousel
-		  \item preserve long-time dependency by maintaining gradient over time. 
-		 \end{itemize}
-		 \begin{figure}
-		  \includegraphics[width=\textwidth]{LSTMGra.png}
-		 \end{figure}
+		      \begin{itemize}
+			\item gates are trained to learn when it shoud be open/closed. 
+			\item Constant Error Carousel
+			\item preserve long-time dependency by maintaining gradient over time. 
+		      \end{itemize}
+		      
+		      \begin{figure}
+			\includegraphics[width=0.8\textwidth]{LSTMGra.png}
+		      \end{figure}
 
 
 		\end{frame}
@@ -818,9 +823,9 @@ memory past hidden state.
 		\begin{minipage}[t]{\linewidth}
 		    \begin{figure}[b]
 		    \only<1>{\includegraphics[width=\linewidth]{CRBMDNN.png}}
-		    \only<2>{\includegraphics[width=.8\linewidth]{CRBMLSTM.png}}
+		    \only<2>{\includegraphics[width=.9\linewidth]{CRBMLSTM.png}}
 		    \only<3>{\includegraphics[width=.8\linewidth]{LSTMpure.png}}
-		    \only<4>{\includegraphics[width=.8\linewidth]{LSTM.png}}
+		    \only<4>{\includegraphics[width=\linewidth]{LSTM.png}}
 		  \end{figure}
 		\end{minipage}
 	\end{frame}
@@ -829,111 +834,112 @@ memory past hidden state.
 	      \only<1>
 	      {
 	      \begin{table}[htbp]\centering
-		  \centering
-		  Confusion matrix of CRBM-DNN result
-		  \vspace{10mm}
-% 		  \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
-% 		      \toprule
-% 		      & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
-% 		      \midrule
-% 		      \multirow{5}{*}{\textit{True}}
-% 		      & & Joy & Neutral & Sadness & Anger \\
-% 		      \cmidrule{2-12}
-% 		      & Joy             &\textcolor{red}{57.7\%} &1.4\%   		  & 0.0\%		& 40.8\%\\
-% 		      & Neutral         & 17.7\%			&\textcolor{red}{54.4\%} &25.3\%   	&2.5\%     \\
-% 		      \rot{\rlap{~\textit{{True}}}}
-% 		      & Sadness         &1.6\%			&27.9\%   		  &\textcolor{red}{70.5\%}   &0.0\%    \\
-% 		      & Anger           & 39.4\%			&1.6\%  		  &0.0\%   	&\textcolor{red}{59.1\%}    \\
-% 		      \midrule
-% 		      & \multicolumn{5}{c}{recognition rate:59.76\%}\\
-% 		      \bottomrule
-% 		      \cmidrule[1pt]{2-12}
-% 		    \end{tabular*}
-		  \label{tab:CRBMDNN}
+	      \centering
+	      Confusion matrix of CRBM-DNN result.\\
+	      \vspace{10mm}
+	      \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
+		  \toprule
+		  & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
+	      %     \midrule
+		  \multirow{5}{*}{\textit{True}}
+		  & & Joy & Neutral & Sadness & Anger \\
+	      %     \cmidrule{2-12}
+		  & Joy             &\textcolor{red}{57.7\%} &1.4\%   		  & 0.0\%		& 40.8\%\\
+		  & Neutral         & 17.7\%			&\textcolor{red}{54.4\%} &25.3\%   	&2.5\%     \\
+	      %     \rot{\rlap{~\textit{{True}}}}
+		  & Sadness         &1.6\%			&27.9\%   		  &\textcolor{red}{70.5\%}   &0.0\%    \\
+		  & Anger           & 39.4\%			&1.6\%  		  &0.0\%   	&\textcolor{red}{59.1\%}    \\
+		  \midrule
+		  & \multicolumn{5}{c}{recognition rate:59.76\%}\\
+		  \bottomrule
+	      %     \cmidrule[1pt]{2-12}
+		\end{tabular*}
+	      \label{tab:CRBMDNN}
 	      \end{table}
 	      }
 	      \only<2>
-	      {
-		\begin{table}[htbp]\centering
+	      {\begin{table}[htbp]\centering
 		\centering
-		Confusion matrix of CRBM-LSTM result
+		Confusion matrix of CRBM-LSTM result.\\
 		\vspace{10mm}
-% 		\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
-% 		    \toprule
-% 		    & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
-% 		    \midrule
-% 		    \multirow{5}{*}{\textit{True}}
-% 		    & & Joy & Neutral & Sadness & Anger \\
-% 		    \cmidrule{2-12}
-% 		    & Joy             &\textcolor{red}{11.3\%} &9.9\%   		  &   2.8\%	&    76.1\%\\
-% 		    & Neutral         & 0.0\%			&\textcolor{red}{72.2\%} &17.7\%   	&10.1\%     \\
-% 		    \rot{\rlap{~\textit{{True}}}}
-% 		    & Sadness         &0.0\%			&4.8\%   		  &\textcolor{red}{88.7\%}   &6.5\%    \\
-% 		    & Anger           & 0.8\%			&1.6\%  		  &0.0\%   	&\textcolor{red}{97.6\%}    \\
-% 		    \midrule
-% 		    & \multicolumn{5}{c}{recognition rate: 71.98\%}\\
-% 		    \bottomrule
-% 		    \cmidrule[1pt]{2-12}
-% 		  \end{tabular*}
+		      \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
+			  \toprule
+			  & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
+		      %     \midrule
+			  \multirow{5}{*}{\textit{True}}
+			  & & Joy & Neutral & Sadness & Anger \\
+		      %     \cmidrule{2-12}
+			  & Joy             &\textcolor{red}{11.3\%} &9.9\%   		  &   2.8\%	&    76.1\%\\
+			  & Neutral         & 0.0\%			&\textcolor{red}{72.2\%} &17.7\%   	&10.1\%     \\
+		      %     \rot{\rlap{~\textit{{True}}}}
+			  & Sadness         &0.0\%			&4.8\%   		  &\textcolor{red}{88.7\%}   &6.5\%    \\
+			  & Anger           & 0.8\%			&1.6\%  		  &0.0\%   	&\textcolor{red}{97.6\%}    \\
+			  \midrule
+			  & \multicolumn{5}{c}{recognition rate: 71.98\%}\\
+			  \bottomrule
+		      %     \cmidrule[1pt]{2-12}
+			\end{tabular*}
 		\label{tab:CRBMLSTM}
 		\end{table}
 	      }
 	      \only<3>
 	      {
-		\begin{table}[htbp]\centering
-		\centering
-		Confusion matrix of pure LSTM result
-		\vspace{10mm}
-		\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
-		    \toprule
-		    & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
-		    \midrule
-		    \multirow{5}{*}{\textit{True}}
-		    & & Joy & Neutral & Sadness & Anger \\
-		    \cmidrule{2-12}
-		    & Joy             &\textcolor{red}{66.2\%} &4.2\%   		  &   0.0\%	&    29.6\%\\
-		    & Neutral         &6.3\%			&\textcolor{red}{79.7\%} &10.2\%   	&3.8\%     \\
-		    \rot{\rlap{~\textit{{True}}}}
-		    & Sadness         &0.0\%			&19.7\%   		  &\textcolor{red}{80.3\%}   &0.0\%    \\
-		    & Anger           & 12.6\%			&0.8\%  		  &0.0\%   	&\textcolor{red}{86.6\%}    \\
-		    \midrule
-		    & \multicolumn{5}{c}{recognition rate: 81.59\%}\\
-		    \bottomrule
-		    \cmidrule[1pt]{2-12}
-		  \end{tabular*}
-		\label{tab:pureLSTM}
-		\end{table}
+	      \begin{table}[htbp]\centering
+	      \centering
+	      Confusion matrix of pure LSTM result.\\
+	      \vspace{10mm}
+		      \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
+			\toprule
+			& \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
+		    %     \midrule
+			\multirow{5}{*}{\textit{True}}
+			& & Joy & Neutral & Sadness & Anger \\
+		    %     \cmidrule{2-12}
+			& Joy             &\textcolor{red}{66.2\%} &4.2\%   		  &   0.0\%	&    29.6\%\\
+			& Neutral         &6.3\%			&\textcolor{red}{79.7\%} &10.2\%   	&3.8\%     \\
+		    %     \rot{\rlap{~\textit{{True}}}}
+			& Sadness         &0.0\%			&19.7\%   		  &\textcolor{red}{80.3\%}   &0.0\%    \\
+			& Anger           & 12.6\%			&0.8\%  		  &0.0\%   	&\textcolor{red}{86.6\%}    \\
+			\midrule
+			& \multicolumn{5}{c}{recognition rate: 81.59\%}\\
+			\bottomrule
+		    %     \cmidrule[1pt]{2-12}
+		      \end{tabular*}
+	      \label{tab:pureLSTM}
+	      \end{table}
+
 	      }
 	      \only<4>
-	      {\begin{table}[htbp]\centering
-		    \centering
-		    Confusion matrix of LSTM-Rectifier result
-		    \vspace{10mm}
-% 		      \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
-% 			\toprule
-% 			& \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
-% 			\midrule
-% 			\multirow{5}{*}{\textit{True}}
-% 			& & Joy & Neutral & Sadness & Anger \\
-% 			\cmidrule{2-12}
-% 			& Joy             &\textcolor{red}{57.7\%} &7.0\%   		  &   0.0\%	&    35.2\%\\
-% 			& Neutral         &6.3\%			&\textcolor{red}{86.1\%} &6.3\%   	&1.3\%     \\
-% 			\rot{\rlap{~\textit{{True}}}}
-% 			& Sadness         &0.0\%			&6.6\%   		  &\textcolor{red}{93.4\%}   &0.0\%    \\
-% 			& Anger           & 8.7\%			&0.0\%  		  &0.0\%   	&\textcolor{red}{91.3\%}    \\
-% 			\midrule
-% 			& \multicolumn{5}{c}{recognition rate: 83.43\%}\\
-% 			\bottomrule
-% 			\cmidrule[1pt]{2-12}
-% 		      \end{tabular*}
-		    \label{tab:LSTMRec}
-		\end{table}
+	      {
+	      \begin{table}[htbp]\centering
+	      \centering
+	      Confusion matrix of LSTM-Rectifier result.\\
+	      \vspace{10mm}
+		      \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
+			  \toprule
+			  & \multicolumn{5}{c}{\textit{{Classfied}}} \\[1ex]
+		      %     \midrule
+			  \multirow{5}{*}{\textit{True}}
+			  & & Joy & Neutral & Sadness & Anger \\
+		      %     \cmidrule{2-12}
+			  & Joy             &\textcolor{red}{57.7\%} &7.0\%   		  &   0.0\%	&    35.2\%\\
+			  & Neutral         &6.3\%			&\textcolor{red}{86.1\%} &6.3\%   	&1.3\%     \\
+		      %     \rot{\rlap{~\textit{{True}}}}
+			  & Sadness         &0.0\%			&6.6\%   		  &\textcolor{red}{93.4\%}   &0.0\%    \\
+			  & Anger           & 8.7\%			&0.0\%  		  &0.0\%   	&\textcolor{red}{91.3\%}    \\
+			  \midrule
+			  & \multicolumn{5}{c}{recognition rate: 83.43\%}\\
+			  \bottomrule
+		      %     \cmidrule[1pt]{2-12}
+			\end{tabular*}
+	      \label{tab:LSTMRec}
+	      \end{table}
 	      }
 	\end{frame}
 
 
 % 
-% \section{Conclusion and Outlook}
+\section{Conclusion and Outlook}
       \begin{frame}[t]{Conclusion}
 	  \begin{itemize}
 	  \itemsep10pt

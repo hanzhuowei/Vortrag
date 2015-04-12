@@ -28,7 +28,7 @@
 \newcommand{\lang}{german}
 
 % Uncomment the following line, if you want to create handouts (setting to false does not work!)
-%\newcommand{\handoutmode}{true}
+\newcommand{\handoutmode}{true}
 
 % Load beamer class using LSS style
 \input{presentation}
@@ -48,81 +48,74 @@
         commentstyle=\color{green},showstringspaces=false,stringstyle=\color{magenta}\ttfamily}
 
 % -----------------------------------------------------------------------------
-% This is the title page
-\begin{frame}[t,plain]
-	\titlepage
+\begin{frame}
+ Good morning ladies and gentleman, welcome to the presentation of my master thesis, on which i worked together with MR.Lukas Mauch for the past half year. In the coming 30min i'll give a topic about "Deep neural network for speech emotion recognition". 
+\end{frame}
+
+\begin{frame}
+\only<1-1>{ As we know most of the current work of machine learning field has dedicated to computer vision and natural language processing and in NLP the linguistic information is recognized whereas the paralinguistic is discarded. But a more natural human-machine interaction requires also paralinguistic information where the personality of the speaker can also be recognized, such as age, gender and emotion. \\
+ 
+To deal with emotion recognition we should firstly recognize the speech emotion data in the view of pattern recognition, where the emotion data is considered as ...........\\
+
+The state of the art in emotion recognition mostly based on GMM-HMM, where GMM tries to model the data distribution of speech data, however the work requires a lot of hand-crafted features and the number of component of GMM is generally restricted due to computation cost. \\
+}
+
+\only<2->{
+In order to model the speech emotion sufficiently, we exploit a technique called deep learning, which is a quite new field of machine learning and is currently widely disscussed.   \\
+
+With deep architecture we can extract complex structure and building  internal representations via unsupversied learning, those ideas have seen success in vision and audio processing ....
+}
+\end{frame}
+
+\begin{frame}
+ The content of this talk can be divided into following parts. Firstly the foundation of emotion recognition is shortly introduced which followed by second chapter to talk about CRBM in detail. And, in the third chapter i going to give a introduction to deep neural network regarding its basic structure and functions and how they are trained. Afterwards the Long short term memory for sequential modelling is discussed and then the result of this work is showed. Finally i am going to draw a short conclusion and give a outlook of the future research. 
+\end{frame}
+
+\begin{frame}
+ MFCC is one of the most commonly used features in speech emotion recognition.\\
+ THe ...spectrum is calcuated ... and tranformed with the following equation to mel-scale in order to ....\\
 \end{frame}
 
 
-% -----------------------------------------------------------------------------
-% % Motivation slide
-% \begin{frame}[t]{Motivation}
-% \tikzset{neuron/.style={circle,thick,fill=black!25,minimum size=17pt,inner sep=0pt},
-%     input neuron/.style={neuron, draw,thick, fill=gray!30},
-%     hidden neuron/.style={neuron,fill=white,draw},
-%     output neuron/.style={neuron,draw,thick,fill=black!20},
-%     hoz/.style={rotate=-90}}   %<--- for labels
-% 
-% \begin{tikzpicture}[-,draw=black, node distance=\layersep,transform shape,rotate=90]  %<-- rotate the NN
-% 
-% % Draw the input layer nodes
-% \foreach \name / \y in {1/1,2/2,3/3,5/m}
-% \node[input neuron, hoz] (I-\name) at (0,-\name) {\color{black}$x_\y$};
-% 
-% \node[hoz] (I-4) at (0,-4) {$\dots$};
-% 
-% % Draw the hidden layer nodes
-% \foreach \name / \y in {1/1,2/2,3/3,6/n}
-% \path[yshift=0.5cm] node [hidden neuron, hoz] (H-\name) at (\layersep,-\name cm) {\color{black}$h_\y$};
-% 
-% \path[yshift=0.5cm]
-%    node[hoz] () at (\layersep,-4 cm) {$\dots$};
-% \path[yshift=0.5cm]
-%    node[hoz] () at (\layersep,-5 cm) {$\dots$};
-% 
-% 
-% %%%%%%%%%% Draw the output layer nodes
-% 		      \foreach \name / \y in {1/1,2/2,3/3,4/4}
-% 		      \path[yshift=-0.5cm] node [output neuron, hoz](O-\name) at (\layersept,-\name cm){\color{black}$y_\y$};
-% 
-% % 		      \node[output neuron,hoz] () at (\layersept,-3 cm) {$\dots$};
-% 		      
-% \path node[hoz,right] at ($(I-5)!0.5!(H-6)$) {\color{black}$\mathbf{W}^{(1)}$};      
-% \path node[hoz,right] at ($(H-6)!0.5!(O-4)$) {\color{black}$\mathbf{W}^{(2)}$}; 
-% \path node[hoz,right] at (\layersep + 0.3 cm,-6 cm) {\color{black}Activation\includegraphics[width=0.1\textwidth]{activation.png}}; 
-% % Connect every node in the input layer with every node in the  hidden layer.
-%     \foreach \source in {1,2,3,5}
-%         \foreach \dest in {1,2,3,6}
-%             \path (I-\source.north) edge (H-\dest.south);
-%     \foreach \source in {1,2,3,6}
-%       \foreach \dest in {1,2,3,4}
-% 	  \path (H-\source.north) edge (O-\dest.south);
-% \end{tikzpicture}
-% 
-% \end{frame}
-% 
-\begin{frame}[t]
-\begin{table}[htbp]\centering
- \centering
- \caption{Comparison of commonly used models for feature learning}
- \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}} cl*{4}c @{}}
-%     & \multicolumn{5}{c}{\textit{\tiny{Classfied}}} \\[1ex]
-    \toprule
-    &Model & Temporal Dependency & Memory & Generaltive \\
-    \midrule
-%     \cmidrule{2-12}
-    & ANN		& -	&-	& -	\\
-    & RBM             	& - 	& - 	&  \OK   \\
-    & CRBM         	& \OK 	& 2-5 	& \OK     \\
-    & AE         	& - 	& -  	&  - 	   \\
-    & RNN           	& \OK 	& 1-100	&  -	  \\
-    & LSTM		& \OK	& 1-1000& -	\\
-    \bottomrule
-%     \cmidrule[1pt]{2-12}
-  \end{tabular*}
-\label{tab:modelcompare}
-\end{table}
+\begin{frame}
+ The framework of emotion recognition is illustrated in the figure ...\\
+ Then those are the foundation of this work and in the next we are going to talk about CRBM
 \end{frame}
+
+
+\begin{frame}
+ To extract the emotion representations from the pre-processed MFCC features we build a temporal model named CRBM \\
+ In order to understand how this works we firstly take a look at the basic concept called RBM, which...P of a set of training data x, and probability distribution has some parameters to be learned during the training.\\
+ RBM is trained in ... \\
+ RBM is 
+ 
+\end{frame}
+
+\begin{frame}
+ A RBM defines a basic structure showed with this figure. It has one visible layer of binary units denoted as vector x for receiving input data and one hidden layer of binary units denoted as vector h. for representations. each unit in visible layer is connected to each unit in hidden layer and the inter-layer connection is specified with the weight matrix W. b and c denotes the visible and hidden bias vector repectively. \\
+ 
+ Notice that the restriction of this model is that there is no intraconnection within each layer that is also the reason why this is called boltzmann machine. 
+\end{frame}
+
+\begin{frame}
+ There are several important definitions for understanding RBM. \\
+ The first concept is Energy FUnction called E subscript theta, theta denotes the parameter set W,b and c. The energy function defines the structure of the RBM, in other words the is related to how the visible and hidden layer connected with each other.\\
+ Then we have a joint distribution P of x,h... , and Z is called partition funtion in order to normaliz e the righ-hand side term sothat it should be a sufficient probability distribution. \\
+ from  the definition of the probability distribution we can see that if a higher probability is desired, the energy function should be small. if you are familiar with thermodynamic, you may have heard about Boltzmann distribution which tells us about the state of the system depending on its energy. With lower energy the system is by definition more stable and this idea is borrowed to build RBM. \\
+ Another concept Free Energy is defined and will be used in training RBM, we are going to cover this part later. 
+\end{frame}
+
+\begin{frame}
+ The inference of RBM is quite straightforward it requires only the mathematical calculation where the marginal distribution is calcualted and using Bayes' theorem we can then get the conditional distribution. Then it allows us to calcualte the probability of one particular taking value one given the corresponding input or hidden vector. 
+\end{frame}
+
+\begin{frame}
+ The RBM is a static model. However the emotion in speech varies over both short and long time period and consequently we need a temporal model to capture those short and long term variation. Therefore before we come to the training of the energy-based model, i am going to introduce an extention of RBM named CRBM\\
+ 
+ The matrix A and B are weight parameters of 
+\end{frame}
+
+
 
 % -----------------------------------------------------------------------------
 %

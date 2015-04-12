@@ -85,34 +85,34 @@
 
 % -----------------------------------------------------------------------------
 % Motivation slide
-% \begin{frame}[t]{Motivation} % 1 folie
-% % \textcolor{blue}{\Large Training objective}
-% \only<1-1>{
-% \textcolor{blue}{\Large Speech Emotion Recognition}\\
-% 	\begin{itemize}
-% 		\itemsep20pt
-% % 		\item Most current work focuses on speech processing based on linguistic information,  e.g.: Skype Translator
-% 		\item More natural human-machine interaction requires paralinguistic information such as age, gender, emotion.
-% 		\item Emotion data are high-dimensional complex data with non-linear temporal hidden features
-% 		\item GMM is insufficient
-% % 		\item Speech Recognition / Speeker Identification / Emotion Recognition
-% 		\only<1-1>{\begin{figure}[b]
-% 		 \includegraphics[width=0.6\linewidth]{paraliguistic.png}
-% 		\end{figure}}
-% 
-% 	\end{itemize}
-% }
-% 
-% \only<2-2>{
-% \textcolor{blue}{\Large Deep Learning}\\
-% 	\begin{itemize}
-% 	    \itemsep15pt
-% 	    \item New research area of machine learning (from shallow to deep structure)
-% 	    \item Deep architecture for extracting complex structure and building internal representations via unsupervised learning
-% 	    \item Widely applied in vision/audition processing, e.g. handwriting recognition (Graves, Alex, et al. 2009), traffic sign classification (Schmidhuber, et al. 2011), text translation (Google, 2014)
-% 	\end{itemize}
-% }
-% \end{frame}
+\begin{frame}[t]{Motivation} % 1 folie
+% \textcolor{blue}{\Large Training objective}
+\only<1-1>{
+\textcolor{blue}{\Large Speech Emotion Recognition}\\
+	\begin{itemize}
+		\itemsep15pt
+% 		\item Most current work focuses on speech processing based on linguistic information,  e.g.: Skype Translator
+		\item More natural human-machine interaction requires paralinguistic information such as age, gender, emotion.
+		\item Emotion data are high-dimensional complex data with non-linear temporal hidden features
+		\item GMM is not sufficient enoug to modelling speech emotion
+% 		\item Speech Recognition / Speeker Identification / Emotion Recognition
+		\only<1-1>{\begin{figure}[b]
+		 \includegraphics[width=0.6\linewidth]{paraliguistic.png}
+		\end{figure}}
+
+	\end{itemize}
+}
+
+\only<2-2>{
+\textcolor{blue}{\Large Deep Learning}\\
+	\begin{itemize}
+	    \itemsep15pt
+	    \item New research area of machine learning (from shallow to deep structure)
+	    \item Deep architecture for extracting complex structure and building internal representations via unsupervised learning
+	    \item Widely applied in vision/audition processing, e.g. handwriting recognition (Graves, Alex, et al. 2009), traffic sign classification (Schmidhuber, et al. 2011), text translation (Google, 2014)
+	\end{itemize}
+}
+\end{frame}
 
 % -----------------------------------------------------------------------------
 % This is the table of contents. You can insert a motivation before or after this slide.
@@ -141,67 +141,77 @@
 }
 
 %% =========
-\section{Foundations} %2 folies
+\section{Foundations} %1 F
 % -----------------------------------------------------------------------------
-    \subsection{Mel Frequency Cepstral Features}
-	\begin{frame}[t]{Mel Frequency Cepstral Features}
-		\begin{minipage}[t]{0.48\linewidth}
+	\begin{frame}[t]{Foundations}
+	\txtcolb{Mel Frequency Cepstral Coefficients}
 			\begin{itemize}
-				\item short-term power spectrum 
+				\item most commonly used features in speech emotion analysis 
+				\item short-term power spectrum based on frame
 				\item mel-scale approximate human perception
-				\item widely-used in speech recognition tasks
-				\item Transformation between Mel and Hertz scale
-				\begin{figure}
-
-				\begin{eqnarray}
-				f_{mel} = 1125~\ln~(1+f_{Hz}/700)\nonumber\\
-				f_{Hz} = 700 \left(\exp(f_{mel}/1125)-1\right)\nonumber
-				\end{eqnarray}
-
-			\end{figure}
+				\begin{align}
+				f_{mel} = 1125~\ln~(1+f_{Hz}/700)\nonumber
+				\end{align}
 			\end{itemize}
-		\end{minipage}
-		\begin{minipage}[t]{0.48\linewidth}
+
 		\begin{figure}
-		 \includegraphics[width = \linewidth]{MelvsHz.png}
+		 \includegraphics[width = 0.5\linewidth]{MelvsHz.png}
 		\end{figure}
-		\end{minipage}
 	\end{frame}
 	
-	\begin{frame}[t]{Framework}
+	
+	\begin{frame}[t]{Pre-processing for MFCCs}
+	\txtcolb{Steps to MFCCs}
+		      \begin{enumerate}
+		      \item Convert speech signal with overlapped window to frames ($20ms$ frame length, $10ms$ shifting).
+		      \item Calculate power spectrum for each frame with DFT and take the logarithm value.
+		      \item Apply Mel filterbank to the power spectrum, sum the power in each filter.
+		      \item Decorrelation by applying Discrete Cosine Transform (DCT) to the logarithm of the filter powers.
+		      \item Keep coefficients $1-20$ of DCT and discard the rest.
+		      \end{enumerate}
+
+		      \begin{figure}[htbp]
+		      \includegraphics[width= \textwidth]{mfcc.png}
+		      \end{figure}
+	\end{frame}
+	
+	\begin{frame}[t]{Foundations}
+	\txtcolb{Framework of Emotion Recognition}
 	      \begin{itemize}
 	       \item Pre-processing of emotion data to extract MFCC features
 	       \item Model data distribution based on MFCCs via unsupervised learning
 	       \item Classification with supervised learning
 	      \end{itemize}
+	      \vspace{10mm}
+	      \includegraphics[width=\linewidth]{Framework.png}
 
 	\end{frame}
 % 
 % 
 % % 
-\subsection{Emotion Recognition Approaches}
-
-\begin{frame}[t]{Emotion Recognition Approaches}
-	\begin{minipage}[t]{0.48\linewidth}
-	  \textcolor{blue}{\Large Traditional Approaches}
-	  \begin{itemize}
-	   \item pre-selected features
-	   \item supervised training
-	   \item low-level features not appropriate for claasification
-	   \item shallow structure of classifiers
-	  \end{itemize}
-	\end{minipage}\hfill
-	\begin{minipage}[t]{0.48\linewidth}
-	\textcolor{blue}{\Large Deep Learning Approaches}
-	  \begin{itemize}
-	   \item learning representations from high-dim data
-	   \item extracting appropriate features without hand-crafting
-	   \item low-level features are used to build high-level features as network gets deeper
-	   \item frame-based classification
-	  \end{itemize}
-
-	\end{minipage}
-\end{frame}
+% \subsection{Emotion Recognition Approaches}
+% 
+% \begin{frame}[t]{Emotion Recognition Approaches}
+% 	\begin{minipage}[t]{0.48\linewidth}
+% 	  \textcolor{blue}{\Large Traditional Approaches}
+% 	  \begin{itemize}
+% 	   \item pre-selected features
+% 	   \item supervised training
+% 	   \item low-level features not appropriate for claasification
+% 	   \item shallow structure of classifiers
+% 	  \end{itemize}
+% 	\end{minipage}\hfill
+% 	\begin{minipage}[t]{0.48\linewidth}
+% 	\textcolor{blue}{\Large Deep Learning Approaches}
+% 	  \begin{itemize}
+% 	   \item learning representations from high-dim data
+% 	   \item extracting appropriate features without hand-crafting
+% 	   \item low-level features are used to build high-level features as network gets deeper
+% 	   \item frame-based classification
+% 	  \end{itemize}
+% 
+% 	\end{minipage}
+% \end{frame}
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conditional Restricted Boltzmann Machine} %% 
@@ -209,7 +219,7 @@
 	\begin{frame}[t]{Restricted Boltzmann Machine}
 	 \begin{itemize}
 	  \itemsep10pt
-	  \item Generative graphical model, capture data distrbution $P(\x|\boldsymbol{\theta})$
+	  \item Generative energy-based graphical model, capture data distrbution $P(\x|\boldsymbol{\theta})$
 	  \item Trained in unsupervised way, only use unlabeled input sequence $\x$ for learning. 
 		  \begin{itemize}
 		   \item automatically extract useful features from data 
@@ -219,7 +229,7 @@
 	  \item Successfully applied in motion capture (Graham W. Taylor, Geoffrey E. Hinton, 2006)
 % 	  \item speicifies a joint distribution over input and hidden variables, can either generating data, or with bayesian
 % rule to form conditional distribution. 
-	  \item Potential to be extend to capture temporal information
+	  \item non-temporal, but is potential to be extended to capture temporal information
 	 \end{itemize}
 	\end{frame}
 	
@@ -230,15 +240,16 @@
 	    \end{figure}
 	    \only<1-1>
 	    {\begin{align}
-	      \x \in \{0,1\}\nonumber\\
-	      \h \in \{0,1\}\nonumber
+	      &\text{visible/input layer} &\x \in \{0,1\}\nonumber\\
+	      &\text{hidden layer} &\h \in \{0,1\}\nonumber\\
+	      &\text{parameter set} &\btheta = \{\mathbf{W},\mathbf{b},\mathbf{c}\}\nonumber
 	     \end{align}
 
 	    }
 	    \only<2->{
 	      \begin{minipage}{0.48\linewidth}
 	      \begin{align}
-		\text{Energy Function:}~&E_{\boldsymbol{\theta}} = -\mathbf{x^{T}}\mathbf{W}\mathbf{h}-\mathbf{b^{T}}\x-\mathbf{c^{T}}\mathbf{h}\nonumber\\
+		\text{Energy Function:}~&E_{\boldsymbol{\theta}}(\x,\h) = -\mathbf{x^{T}}\mathbf{W}\mathbf{h}-\mathbf{b^{T}}\x-\mathbf{c^{T}}\mathbf{h}\nonumber\\
 	      \text{Joint Distribution:}~&P^{RBM} (\x,\mathbf{h}) = \frac{1}{Z} e^{-E_{\boldsymbol{\theta}}(\x,\mathbf{h})}\nonumber\\
 	      \text{Partition Function:}~ &Z = \sum_{\mathbf{x,h}} e^{-E_{\boldsymbol{\theta}}(\x,\mathbf{h})}\nonumber\\
 	      \text{Free Energy:}~& \mathcal{F}(\x) = - \log \sum_h e^{-E(\mathbf{x,h})}\nonumber
@@ -254,11 +265,10 @@
 			 \begin{align}
 			 &P(\x) = \sum_{\mathbf{h}} P(\mathbf{x,h})\nonumber\\ 
 			 &P (\mathbf{h}) = \sum_{\x} P(\mathbf{x,h})\nonumber\\
-			 \only<2->{&P (\h|\x)= \dfrac{P(\x,\h)}{P(\x)}\nonumber\\
-			 &P(\x|\h)= \dfrac{P(\x,\h)}{P(\h)}\nonumber\\}
-			 \only<3->{&P(h_{j}=1 \mid \x)= sigmoid(\sum_{i} x_{i}W_{ij} + c_{j})\nonumber\\
-			 &P(x_{i}=1 \mid \mathbf{h}) = sigmoid(\sum_{j} W_{ij} h_{j} + b_{i})\nonumber}
-			 \notag
+			 &P (\h|\x)= \dfrac{P(\x,\h)}{P(\x)}\nonumber\\
+			 &P(\x|\h)= \dfrac{P(\x,\h)}{P(\h)}\nonumber\\
+			 &P(h_{j}=1 \mid \x)= sigmoid(\sum_{i} x_{i}W_{ij} + c_{j})\nonumber\\
+			 &P(x_{i}=1 \mid \mathbf{h}) = sigmoid(\sum_{j} W_{ij} h_{j} + b_{i})\nonumber
 			 \end{align}
 		 \end{minipage}
 	\end{frame}
@@ -288,17 +298,6 @@
 	    }
 
 
-	\end{frame}
-	
-	\begin{frame}[t]{Conditional RBM}
-	      \begin{align}
-		\text{Energy Function:}~&E^{CRBM}_{\boldsymbol{\theta}} (\x, \mathbf{h})  = \left\| \frac{\x - \tilde{\mathbf{b}}}{2} \right\|^{2}
-      -\tilde{\mathbf{c}}^T \mathbf{h}-\x^{T} \mathbf{W}\mathbf{h} \nonumber\\
-		\text{Free Energy:}~&\mathcal{F}(\x) = \left\| \x - \tilde{\mathbf{b}} \right\|^{2} - \log (1+e^{\tilde{\mathbf{c}}+\x\cdot \mathbf{W}})\nonumber\\
-		&\tilde{\mathbf{b}} = \mathbf{b} + \mathbf{A}\cdot \x_{<t}\nonumber\\
-		&\tilde{\mathbf{c}} = \mathbf{c} + \mathbf{B}\cdot \x_{<t}\nonumber\\
-		&\boldsymbol{\theta} = \left \{\mathbf{W,A,B,b,c} \right\}\nonumber
-	      \end{align}
 	\end{frame}
 	
 	\begin{frame}[t]{Training of Energy-based Model}
@@ -471,7 +470,7 @@
 %   
 % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% =========
 
-\section{Multilayer Neural Network}%4 folies
+\section{Deep Neural Network}%4 folies
 	\subsection{Function and Training}		
 	\begin{frame}[t]{Structure and Function}
 % 	\txtcolb{N-hidden layers neural network }
