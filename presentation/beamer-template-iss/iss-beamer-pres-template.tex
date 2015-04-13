@@ -112,7 +112,75 @@ With deep architecture we can extract complex structure and building  internal r
 \begin{frame}
  The RBM is a static model. However the emotion in speech varies over both short and long time period and consequently we need a temporal model to capture those short and long term variation. Therefore before we come to the training of the energy-based model, i am going to introduce an extention of RBM named CRBM\\
  
- The matrix A and B are weight parameters of 
+ The matrix A and B are weight parameters of history visible units to current vis, and history visible units to current hidden units. \\
+ Now the visible units are \\
+ same as RBM the energy function defines how the units connected with each other, where tilde b is defined as the original bias of visible layer plus the weight matrix A times history visible units, x subscript smaller than t, and the number of history input is specified by N, as shown in the figure intop. similarly case for the hidden bias tilde c. now the parameter set consists of ....and the free energy is also changed. 
+\end{frame}
+
+\begin{frame}
+ Now let's see how can the energy-based model be trained with MLE. 
+ Firstly i am going to introduce the KL-div, which defines the difference between two probability distributions by calculating the follow equation, here the integral is used when we have a continuous distribution and for the case of crbm where the distribution is discrete, the integral is substitued by the sum over x. 
+ As previous discussed, we want to use a model to approximate the true data distribution, here the Q...P is .... and the brackets denotes the ...\\
+%  [click]
+ the first term on the right hand side is the distribution of the data, it can be treated as a constant value during the optimization so the objective remains only the second term
+\end{frame}
+
+\begin{frame}
+ With the definition of free energy we can now rewrite the likelihood distribution its partial derivative with respect to the parameter set. \\
+ if we average the derivative over the data , the objective function ---(how become expectation over ...???\\
+ but the problem is that the calculation of the second term on the righthand side requires all configuration of the model which makes it impossible to be done directly, so we need to do sampling sufficiently to approximate the model distribution.
+\end{frame}
+
+\begin{frame}
+ the technique used for sampling is Gibbs sampling where it performs a markov chain starting from the visible layer at time 0 and the hidden state at time 0 can be calculated with conditional probability, then the visible at time 1 is again calculated with conditional probability.. so this is a full step of Gibbs sampling. \\
+%  [click]
+ The gibbs step repeats up to k full steps, where k is a pre-defined variable. 
+\end{frame}
+
+\begin{frame}
+ With k=0, the probability represente the distribution of input data which is independent of parameter set theta.\\
+ if Gibbs-steps is performed with big enough k steps e.g. up to infinite then the markov chain is guarantted to converge to ....:
+ [click]
+ so the model distribution can be approximated with the sampled distribution and the objective function can be rewritten as:
+\end{frame}
+\begin{frame}
+ But in practise we cannot run the steps waiting until the chain converges and instead of optimizing the divergence between 0 step and infinite step, another concept is introduced by Hinton named Contrastive Divergence\\
+where the difference of KL between P0 and Pinfinity and KL bet . . P1 and Pinfinity is minimized by calculating the following equation. It has already been known from many experiment that by ruuning one full gibbs step we can already get good approxmation of model distribution\\
+From the literature by Hinton, we know that the third term of righthand side is irrelavant in optimization, so we can omit it during the training and simpify the CD.\\
+Then we have the updating rule for the parameter set. 
+\end{frame}
+
+\begin{frame}
+ So in the next we are going to see the Deep Neural Network. The origin of artificial neural network trace back to the 60 and 70 in last century. To immitate how the human brain works, the scientists have used the aritificial neurons and connections to build up the structure of neural network which is illustrated with the figure on the right. The structure shows a single hidden layer feedforward neural network. The data are fed forward from input layer on the bottom and through a hidden layer then to the output layer on the top. \\
+ 
+ the preactivation a of x of the hidden layer can be calculated by multiplying the input vector with weight matrix W superscript 1, adding the bias vector to the product. \\
+ 
+ mapping the preact a  by a non-linear activation function f we can calcualte the activation of the hidden layer. \\
+ 
+ similarly the activation of the output layer hat y is calcualted based on the hidden layer. The output layer can be prediction or classification or fed as input of further network, depending on different activation function. \\
+ 
+ If the number of hidden units is more than 1, then we'll have a multi-layer neural network or DNN.
+\end{frame}
+\begin{frame}
+ Training the neural network is generally done via supervised learning to minimize the empirical risk, which is show in the first equation. It is the averge of loss over a data sequence of size M and plus some regularization term lambda gama of theta. 
+ In the optimization the first-order technique gradient descent is most commonly used, where the gradient of each activation wrt to the parameter theta is calculated and backpropagated through the whole network. \\
+ In practise the normal batch-gradient requires too much computation so in general the stocha.. and mini ...are applied.
+\end{frame}
+
+\begin{frame}
+ it has been a big topic in machine learning for quite a long time that how to train a deeper structure sufficiently and effectively, since the deeper the network is, the more useful features can be extracted and the network should be more powerful in classification tasks. But the training of multi-layer neural network via BP suffers from vanishing gradient problem. \\
+ Obviously the training time incre...... and most important is that the ....From literature it is recognized that the gradient vanishing is caused by...., so to cope with this problem a technique named .... is applied. \\
+ The deep network is trained .... in every step each layer... where hat x is the reconstruction from auto-encoder\\
+ after pre-training step the ...entire network is fine-tuned with ...
+\end{frame}
+
+\begin{frame}
+ With this figure the pre-training step is illustrated in detail. At step 1 the training data is firstly mapped to the hidden layer to extract some features and then mapped again to output layer for reconstruction the input.  After finishing minimize the reconstruction error for the first hidden layer the training is then fed to the pre-trained first hidden layer and from bottom up mapped to the second hidden layer and build the reconstruction of the firsty hidden layer. Now the optimization objective is the second layer, in this case the first hidden layer is treated as input and the recon. error is minimized wrt the first hidden layer. \\
+ This steps repeats by feeding the training data directly to the pre-trained layer and minimize the corresponding reconstruction until all the hidden layer of the network is pretrained. Next is to do the supervised training, now BP won't suffers from the gradient vanishing problem since the paramter is good initialized with pre-training step.
+\end{frame}
+
+\begin{frame}
+ Same as all other models the dnn should face with the overfitting problem. The dnn often have a large size first hidden layer
 \end{frame}
 
 

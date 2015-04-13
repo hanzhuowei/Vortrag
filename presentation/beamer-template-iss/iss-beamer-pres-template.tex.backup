@@ -110,7 +110,24 @@ With deep architecture we can extract complex structure and building  internal r
 \end{frame}
 
 \begin{frame}
- As we seen till now, the RBM is a static model which is capable to capture  Before we come to the training of the this energy-based model, 
+ The RBM is a static model. However the emotion in speech varies over both short and long time period and consequently we need a temporal model to capture those short and long term variation. Therefore before we come to the training of the energy-based model, i am going to introduce an extention of RBM named CRBM\\
+ 
+ The matrix A and B are weight parameters of history visible units to current vis, and history visible units to current hidden units. \\
+ Now the visible units are \\
+ same as RBM the energy function defines how the units connected with each other, where tilde b is defined as the original bias of visible layer plus the weight matrix A times history visible units, x subscript smaller than t, and the number of history input is specified by N, as shown in the figure intop. similarly case for the hidden bias tilde c. now the parameter set consists of ....and the free energy is also changed. 
+\end{frame}
+
+\begin{frame}
+ Now let's see how can the energy-based model be trained with MLE. 
+ Firstly i am going to introduce the KL-div, which defines the difference between two probability distributions by calculating the follow equation, here the integral is used when we have a continuous distribution and for the case of crbm where the distribution is discrete, the integral is substitued by the sum over x. 
+ As previous discussed, we want to use a model to approximate the true data distribution, here the Q...P is .... and the brackets denotes the ...\\
+ [click]
+ the first term on the right hand side is the distribution of the data, it can be treated as a constant value during the optimization so the objective remains only the second term
+\end{frame}
+
+\begin{frame}
+ With the definition of free energy we can now rewrite the likelihood distribution its partial derivative with respect to the parameter set. \\
+ if we average the derivative over the data , the objective function ---(how become expectation over ...)
 \end{frame}
 
 
